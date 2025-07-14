@@ -555,17 +555,17 @@ elif st.session_state.step == 5:
         coste_alquiler_acumulado.append(coste_a)
 
     # --- Calcular valores finales para mostrar en cajas resumen ---
-desembolso_inicial_compra = entrada + gastos_compra
-costes_compra = coste_compra_acumulado[-1]
-valor_prop_final = valor_vivienda[-1]
-hipoteca_pendiente = deuda_pendiente[-1]
-patrimonio_neto_final = patrimonio_compra[-1]
-
-inversion_inicial_alq = entrada + gastos_compra
-costes_alquiler = coste_alquiler_acumulado[-1]
-capital_total_invertido = inversion_inquilino
-valor_final_inversion = inversion_alquiler[-1]
-patrimonio_neto_final_alq = valor_final_inversion
+    desembolso_inicial_compra = entrada + gastos_compra
+    costes_compra = coste_compra_acumulado[-1]
+    valor_prop_final = valor_vivienda[-1]
+    hipoteca_pendiente = deuda_pendiente[-1]
+    patrimonio_neto_final = patrimonio_compra[-1]
+    
+    inversion_inicial_alq = entrada + gastos_compra
+    costes_alquiler = coste_alquiler_acumulado[-1]
+    capital_total_invertido = inversion_inquilino
+    valor_final_inversion = inversion_alquiler[-1]
+    patrimonio_neto_final_alq = valor_final_inversion
 
 # --- Visualización tipo "caja resumen" ---
 st.markdown("""
