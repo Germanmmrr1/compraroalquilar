@@ -58,7 +58,7 @@ if st.session_state.step == 1:
     st.markdown("<div class='step-header'>👋 Bienvenido</div>", unsafe_allow_html=True)
     st.markdown("<div class='big-text'>Esta herramienta te ayudará a comparar si te conviene más comprar o alquilar una vivienda según tus datos. Te guiaremos paso a paso para que configures las variables.</div>", unsafe_allow_html=True)
     st.markdown("<div class='big-text'>👉 <i>Ejemplo: Si estás considerando una vivienda de 250.000€ y actualmente pagas un alquiler de 800€, introduce esos valores cuando se te pidan.</i></div>", unsafe_allow_html=True)
-    if st.button("👉 Empezar encuesta"):
+    if st.button("👉 Empezar encuesta", key="start"):
         cambiar_paso(2)
 
 # Paso 2: Variables de Compra
@@ -88,9 +88,9 @@ elif st.session_state.step == 2:
         seguro_vida_eur = 0.0
 
     col1, col2 = st.columns(2)
-    if col1.button("⬅️ Volver"):
+    if col1.button("⬅️ Volver", key="compra_back"):
         cambiar_paso(1)
-    if col2.button("Siguiente ➡️"):
+    if col2.button("Siguiente ➡️", key="compra_next"):
         st.session_state.compra = {
             "precio_vivienda": precio_vivienda,
             "entrada_pct": entrada_pct,
@@ -112,9 +112,9 @@ elif st.session_state.step == 3:
     rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
 
     col1, col2 = st.columns(2)
-    if col1.button("⬅️ Volver"):
+    if col1.button("⬅️ Volver", key="alquiler_back"):
         cambiar_paso(2)
-    if col2.button("Siguiente ➡️"):
+    if col2.button("Siguiente ➡️", key="alquiler_next"):
         st.session_state.alquiler = {
             "alquiler_inicial": alquiler_inicial,
             "subida_alquiler_anual_pct": subida_alquiler_anual_pct,
@@ -157,9 +157,9 @@ elif st.session_state.step == 4:
     st.markdown("<div class='big-text'>Si quieres cambiar algo, usa los botones para volver atrás.</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
-    if col1.button("⬅️ Volver"):
+    if col1.button("⬅️ Volver", key="confirm_back"):
         cambiar_paso(3)
-    if col2.button("✅ Confirmar y Ver resultados"):
+    if col2.button("✅ Confirmar y Ver resultados", key="confirm_next"):
         cambiar_paso(5)
 
 # Paso 5: Mostrar herramienta interactiva
@@ -169,7 +169,6 @@ elif st.session_state.step == 5:
     # Cargar variables desde la sesión
     c = st.session_state.compra
     a = st.session_state.alquiler
-    g = st.session_state.generales
 
     # Variables
     precio_vivienda = c['precio_vivienda']
@@ -183,12 +182,12 @@ elif st.session_state.step == 5:
     subida_alquiler_anual_pct = a['subida_alquiler_anual_pct']
     rentabilidad_inversion_pct = a['rentabilidad_inversion_pct']
 
-    horizonte_anios = g['horizonte_anios']
-    gasto_propietario_pct = g['gasto_propietario_pct']
-    seguro_hogar_pct = g['seguro_hogar_pct']
-    seguro_hogar_eur = g['seguro_hogar_eur']
-    seguro_vida_pct = g['seguro_vida_pct']
-    seguro_vida_eur = g['seguro_vida_eur']
+    horizonte_anios = c.get('plazo_hipoteca', 25)
+    gasto_propietario_pct = c.get('gasto_propietario_pct', 0.0)
+    seguro_hogar_pct = 0.0
+    seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
+    seguro_vida_pct = 0.0
+    seguro_vida_eur = c.get('seguro_vida_eur', 0.0)
 
     # --- Cálculos ---
     entrada = precio_vivienda * entrada_pct / 100
