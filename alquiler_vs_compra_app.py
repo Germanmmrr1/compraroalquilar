@@ -3,6 +3,7 @@ import numpy_financial as npf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 hide_menu_style = """
     <style>
@@ -373,7 +374,35 @@ elif st.session_state.step == 5:
         "Patrimonio Compra (€)": patrimonio_compra,
         "Inversión Alquiler (€)": inversion_alquiler,
         "Coste Compra (€)": coste_compra_acumulado,
-        "Coste Alquiler (€)": coste_alquiler_acumulado
+        "Coste Alquiler (€)": coste_alquiler_acumulado,
     })
 
-    st.download_button("📥 Descargar resultados como CSV", df_resultados.to_csv(index=False), "alquiler_vs_compra_resultados.csv", "text/csv")
+    if "email_confirmed" not in st.session_state:
+        st.session_state.email_confirmed = False
+
+    st.subheader("📧 Descarga de resultados")
+    if not st.session_state.email_confirmed:
+        email = st.text_input(
+            "Introduce tu email para descargar los resultados",
+            key="email_input",
+        )
+        if st.button("Enviar email", key="send_email"):
+            if email:
+                try:
+                    email_path = os.path.join(os.path.dirname(__file__), "emails.txt")
+                    with open(email_path, "a") as f:
+                        f.write(email + "\n")
+                    st.session_state.email_confirmed = True
+                    st.success("Email registrado. Descarga habilitada.")
+                except Exception as e:
+                    st.error(f"Error al guardar el email: {e}")
+            else:
+                st.warning("Por favor ingresa un email válido.")
+
+    if st.session_state.email_confirmed:
+        st.download_button(
+            "📥 Descargar resultados como CSV",
+            df_resultados.to_csv(index=False),
+            "alquiler_vs_compra_resultados.csv",
+            "text/csv",
+        )
