@@ -3,6 +3,7 @@ import numpy_financial as npf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 hide_menu_style = """
     <style>
@@ -56,7 +57,6 @@ def cambiar_paso(siguiente):
 
 # Paso 1: Introducción
 if st.session_state.step == 1:
-    st.markdown("<div class='step-header'>👋 Bienvenido</div>", unsafe_allow_html=True)
     st.markdown("<div class='big-text'>Esta herramienta te ayudará a comparar si te conviene más comprar o alquilar una vivienda según tus datos. Te guiaremos paso a paso para que configures las variables.</div>", unsafe_allow_html=True)
     st.markdown("<div class='big-text'>👉 <i>Ejemplo: Si estás considerando una vivienda de 250.000€ y actualmente pagas un alquiler de 800€, introduce esos valores cuando se te pidan.</i></div>", unsafe_allow_html=True)
     if st.button("👉 Empezar encuesta", key="start"):
@@ -388,7 +388,8 @@ elif st.session_state.step == 5:
         if st.button("Enviar email", key="send_email"):
             if email:
                 try:
-                    with open("emails.txt", "a") as f:
+                    email_path = os.path.join(os.path.dirname(__file__), "emails.txt")
+                    with open(email_path, "a") as f:
                         f.write(email + "\n")
                     st.session_state.email_confirmed = True
                     st.success("Descarga habilitada.")
