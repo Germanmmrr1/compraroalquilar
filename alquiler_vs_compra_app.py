@@ -58,9 +58,7 @@ def cambiar_paso(siguiente):
 # Paso 1: Introducción
 if st.session_state.step == 1:
     st.markdown("<div class='big-text'>Descúbrelo en minutos con esta calculadora interactiva.</div>", unsafe_allow_html=True)
-    st.markdown("<div class='big-text'>Compara el coste total de comprar frente a alquilar teniendo en cuenta precio, revalorización, gastos, impuestos y más.
-Simula distintos escenarios y visualiza gráficamente en qué caso te conviene más comprar o alquilar.
-Ajusta los valores según tu situación y toma la mejor decisión financiera, gratis y en segundos.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='big-text'>Compara el coste total de comprar frente a alquilar teniendo en cuenta precio, revalorización, gastos, impuestos y más. Simula distintos escenarios y visualiza gráficamente en qué caso te conviene más comprar o alquilar. Ajusta los valores según tu situación y toma la mejor decisión financiera, gratis y en segundos.</div>", unsafe_allow_html=True)
     if st.button("👉 Empezar encuesta", key="start"):
         cambiar_paso(2)
 
