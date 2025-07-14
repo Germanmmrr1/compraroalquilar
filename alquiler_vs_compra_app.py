@@ -52,7 +52,7 @@ st.markdown(f"""
 # Paso seguro para ir adelante o atrás
 def cambiar_paso(siguiente):
     st.session_state.step = siguiente
-    st.experimental_rerun()
+    st.rerun()
 
 # Paso 1: Introducción
 if st.session_state.step == 1:
