@@ -21,8 +21,8 @@ if "step" not in st.session_state:
     st.session_state.step = 1
 
 # Barra de progreso visual mejorada
-total_steps = 5
-step_labels = ["Inicio", "Compra", "Alquiler", "Horizonte", "Revisión", "Resultados"]
+total_steps = 4
+step_labels = ["Inicio", "Compra", "Alquiler", "Revisión", "Resultados"]
 progress_value = (st.session_state.step - 1) / total_steps
 st.markdown(f"""
 <div style='width: 100%; display: flex; justify-content: space-between; margin-bottom:10px;'>
@@ -107,6 +107,15 @@ elif st.session_state.step == 3:
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Porcentaje esperado de incremento anual del alquiler.")
     rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
 
+    horizonte = st.number_input(
+        "⏳ Horizonte de comparación (años)",
+        1,
+        50,
+        st.session_state.get('horizonte', 25),
+        step=1,
+        help="Número de años para comparar alquiler y compra."
+    )
+
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="alquiler_back"):
         cambiar_paso(2)
@@ -116,27 +125,11 @@ elif st.session_state.step == 3:
             "subida_alquiler_anual_pct": subida_alquiler_anual_pct,
             "rentabilidad_inversion_pct": rentabilidad_inversion_pct
         }
+        st.session_state.horizonte = horizonte
         cambiar_paso(4)
 
 # Paso 4: Horizonte de comparación
 elif st.session_state.step == 4:
-    st.markdown("<div class='step-header'>⏳ Paso 3 de 4: Horizonte de comparación</div>", unsafe_allow_html=True)
-    horizonte = st.number_input(
-        "Horizonte de comparación (años)",
-        1,
-        50,
-        st.session_state.get('horizonte', 25),
-        step=1,
-    )
-    col1, col2 = st.columns(2)
-    if col1.button("⬅️ Volver", key="horizonte_back"):
-        cambiar_paso(3)
-    if col2.button("Siguiente ➡️", key="horizonte_next"):
-        st.session_state.horizonte = horizonte
-        cambiar_paso(5)
-
-# Paso 5: Confirmación con resumen visual
-elif st.session_state.step == 5:
     st.markdown("<div class='step-header'>📋 Paso 4 de 4: Resumen y Confirmación</div>", unsafe_allow_html=True)
     st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
     st.markdown("<div class='label'>🏠 Datos de Compra:</div>", unsafe_allow_html=True)
