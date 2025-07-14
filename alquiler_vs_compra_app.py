@@ -185,12 +185,7 @@ elif st.session_state.step == 3:
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Porcentaje esperado de incremento anual del alquiler.")
     rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
     horizonte_anios = st.slider(
-        "Horizonte de análisis (años)",
-        1,
-        40,
-        25,
-        help="Número de años para comparar compra y alquiler.",
-    )
+        "Horizonte de análisis (años)", 1, 40, 25, help="Número de años para comparar compra y alquiler.",)
 
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="alquiler_back"):
