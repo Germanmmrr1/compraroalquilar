@@ -69,6 +69,8 @@ if st.session_state.step == 1:
         </ul>
         """, unsafe_allow_html=True
     )
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
     if st.button("👉 Empezar encuesta", key="start"):
         cambiar_paso(2)
 
