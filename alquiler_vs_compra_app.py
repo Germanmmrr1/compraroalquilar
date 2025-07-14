@@ -391,7 +391,7 @@ elif st.session_state.step == 5:
                     with open("emails.txt", "a") as f:
                         f.write(email + "\n")
                     st.session_state.email_confirmed = True
-                    st.success("Email registrado. Descarga habilitada.")
+                    st.success("Descarga habilitada.")
                 except Exception as e:
                     st.error(f"Error al guardar el email: {e}")
             else:
