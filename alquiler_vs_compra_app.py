@@ -92,15 +92,15 @@ elif st.session_state.step == 2:
         cambiar_paso(1)
     if col2.button("Siguiente ➡️"):
         st.session_state.compra = {
-            "Precio vivienda (€)": precio_vivienda,
-            "Entrada (%)": entrada_pct,
-            "Gastos compra (%)": gastos_compra_pct,
-            "Interés hipoteca (%)": tipo_interes_hipoteca,
-            "Plazo hipoteca (años)": plazo_hipoteca,
-            "Revalorización vivienda anual (%)": revalorizacion_vivienda_pct,
-            "Gastos propietario anuales (%)": gasto_propietario_pct,
-            "Seguro hogar anual (€)": seguro_hogar_eur,
-            "Seguro vida anual (€)": seguro_vida_eur
+            "precio_vivienda": precio_vivienda,
+            "entrada_pct": entrada_pct,
+            "gastos_compra_pct": gastos_compra_pct,
+            "tipo_interes_hipoteca": tipo_interes_hipoteca,
+            "plazo_hipoteca": plazo_hipoteca,
+            "revalorizacion_vivienda_pct": revalorizacion_vivienda_pct,
+            "gasto_propietario_pct": gasto_propietario_pct,
+            "seguro_hogar_eur": seguro_hogar_eur,
+            "seguro_vida_eur": seguro_vida_eur
         }
         cambiar_paso(3)
 
@@ -116,9 +116,9 @@ elif st.session_state.step == 3:
         cambiar_paso(2)
     if col2.button("Siguiente ➡️"):
         st.session_state.alquiler = {
-            "Alquiler mensual (€)": alquiler_inicial,
-            "Subida anual alquiler (%)": subida_alquiler_anual_pct,
-            "Rentabilidad inversión anual (%)": rentabilidad_inversion_pct
+            "alquiler_inicial": alquiler_inicial,
+            "subida_alquiler_anual_pct": subida_alquiler_anual_pct,
+            "rentabilidad_inversion_pct": rentabilidad_inversion_pct
         }
         cambiar_paso(4)
 
@@ -127,13 +127,31 @@ elif st.session_state.step == 4:
     st.markdown("<div class='step-header'>📋 Resumen y Confirmación</div>", unsafe_allow_html=True)
     st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
     st.markdown("<div class='label'>🏠 Datos de Compra:</div>", unsafe_allow_html=True)
-    for key, value in st.session_state.compra.items():
-        st.markdown(f"<div class='big-text'><span class='label'>{key}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
+    compra_labels = {
+        "precio_vivienda": "Precio vivienda (€)",
+        "entrada_pct": "Entrada (%)",
+        "gastos_compra_pct": "Gastos compra (%)",
+        "tipo_interes_hipoteca": "Interés hipoteca (%)",
+        "plazo_hipoteca": "Plazo hipoteca (años)",
+        "revalorizacion_vivienda_pct": "Revalorización vivienda anual (%)",
+        "gasto_propietario_pct": "Gastos propietario anuales (%)",
+        "seguro_hogar_eur": "Seguro hogar anual (€)",
+        "seguro_vida_eur": "Seguro vida anual (€)"
+    }
+    for key, label in compra_labels.items():
+        value = st.session_state.compra.get(key, "-")
+        st.markdown(f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
 
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown("<div class='label'>🏡 Datos de Alquiler:</div>", unsafe_allow_html=True)
-    for key, value in st.session_state.alquiler.items():
-        st.markdown(f"<div class='big-text'><span class='label'>{key}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
+    alquiler_labels = {
+        "alquiler_inicial": "Alquiler mensual (€)",
+        "subida_alquiler_anual_pct": "Subida anual alquiler (%)",
+        "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)"
+    }
+    for key, label in alquiler_labels.items():
+        value = st.session_state.alquiler.get(key, "-")
+        st.markdown(f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='big-text'>Si quieres cambiar algo, usa los botones para volver atrás.</div>", unsafe_allow_html=True)
