@@ -510,8 +510,6 @@ elif st.session_state.step == 5:
         coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
         coste_alquiler_acumulado.append(coste_a)
 
-st.markdown("<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{} años</span></h2>".format(horizonte_anios), unsafe_allow_html=True)
-
 st.markdown("""
 <style>
 .res-box {
