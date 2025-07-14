@@ -8,3 +8,7 @@ Instala las dependencias y lanza la app:
 pip install -r requirements.txt
 streamlit run alquiler_vs_compra_app.py
 ```
+
+Al final del análisis podrás descargar los resultados en CSV. Para habilitar la
+descarga se solicitará que introduzcas tu email. Las direcciones se almacenan
+en el archivo `emails.txt` en la raíz del proyecto.
