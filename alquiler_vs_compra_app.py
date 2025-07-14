@@ -1,6 +1,5 @@
 import streamlit as st
 import numpy_financial as npf
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -177,7 +176,13 @@ elif st.session_state.step == 2:
     </div>
     """,
     unsafe_allow_html=True)
-    tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco%")
+    tipo_interes_hipoteca = st.number_input(
+        "Interés hipoteca (%)",
+        0.1,
+        10.0,
+        2.5,
+        help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco."
+    )
     plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años, normalmente entre 20 y 30 años.")
     revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 4.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 4% y el 5% anual, pero puede variar según zona y mercado.")
     gasto_propietario_pct = st.number_input(
@@ -465,50 +470,6 @@ elif st.session_state.step == 5:
     seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
     seguro_vida_pct = 0.0
     seguro_vida_eur = c.get('seguro_vida_eur', 0.0)
-
-    # --- Cálculos ---
-    entrada = precio_vivienda * entrada_pct / 100
-    gastos_compra = precio_vivienda * gastos_compra_pct / 100
-    capital_financiado = precio_vivienda * (100 - entrada_pct) / 100
-
-    tipo_mensual = tipo_interes_hipoteca / 100 / 12
-    n_meses = plazo_hipoteca * 12
-    cuota_mensual = npf.pmt(tipo_mensual, n_meses, -capital_financiado)
-
-    anios = list(range(1, horizonte_anios + 1))
-    valor_vivienda = []
-    deuda_pendiente = []
-    patrimonio_compra = []
-    inversion_alquiler = []
-    coste_compra_acumulado = []
-    coste_alquiler_acumulado = []
-
-    # Definir aportación anual (puedes ajustar si hay más conceptos)
-    aportacion_anual = (
-        precio_vivienda * gasto_propietario_pct / 100 +
-        seguro_hogar_eur +
-        seguro_vida_eur)
-    capital_invertido = entrada + gastos_compra  # acumulado SIN revalorización
-    valor_inversion = entrada + gastos_compra    # se revaloriza cada año
-
-    capital_total_invertido_arr = []
-    valor_final_inversion_arr = []
-
-    for year in anios:
-        if year > 1:
-            valor_inversion += aportacion_anual
-            capital_invertido += aportacion_anual
-            valor_inversion *= (1 + rentabilidad_inversion_pct / 100)
-            capital_total_invertido_arr.append(capital_invertido)
-            valor_final_inversion_arr.append(valor_inversion)
-
-        coste_c = entrada + gastos_compra + cuota_mensual * 12 * min(year, plazo_hipoteca)
-        coste_c += precio_vivienda * gasto_propietario_pct / 100 * year
-        coste_c += (precio_vivienda * seguro_hogar_pct / 100 + seguro_hogar_eur) * year
-        coste_c += (capital_financiado * seguro_vida_pct / 100 + seguro_vida_eur) * min(year, plazo_hipoteca)
-        coste_compra_acumulado.append(coste_c)
-        coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
-        coste_alquiler_acumulado.append(coste_a)
 
  # --- Cálculos ---
     entrada = precio_vivienda * entrada_pct / 100
