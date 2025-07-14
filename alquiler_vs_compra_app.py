@@ -179,8 +179,7 @@ elif st.session_state.step == 2:
          "• Mantenimiento (100 €/mes aprox., pequeñas reparaciones, electrodomésticos, pintura, etc.)\n"
          "• Tasa de basuras (120 €/año aprox., impuesto municipal por recogida de residuos)\n"
          "Puedes ajustar este porcentaje para que refleje el coste real de tu caso.")
-    seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro del hogar.")
-
+    seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0, 5000, 400, step=50, help="Coste anual del seguro del hogar. 400€ es el precio medio para coberturas básicas, varía según tamaño y ubicación del inmueble")
     incluir_seguro_vida = st.checkbox("Incluir seguro de vida", value=True)
     if incluir_seguro_vida:
         seguro_vida_eur = st.number_input("Seguro vida anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro de vida.")
