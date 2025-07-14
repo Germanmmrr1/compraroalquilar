@@ -159,7 +159,7 @@ elif st.session_state.step == 2:
 
     gastos_compra_pct = st.slider(
     "Gastos de compra (%)",
-    0, 15, 10,
+    0, 15, 12,
     help="Incluye costes de:\n"
          "• Notaría (0,2%–0,5%)\n"
          "• Registro (0,1%–0,3%)\n"
