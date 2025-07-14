@@ -167,6 +167,16 @@ elif st.session_state.step == 2:
          "• Impuestos: 10% IVA (obra nueva) o 6–10% ITP (2ª mano, según CCAA)\n"
          "• Tasación (300–600 €, si hay hipoteca)\n"
          "• Comisión apertura hipoteca (0%–1%)")
+    gastos_compra_eur = precio_vivienda * gastos_compra_pct / 100
+    st.markdown(
+    f"""
+    <div style='display: inline-block; background: #e3f2fd; color: #1565c0;
+                border-radius: 12px; padding: 0.32em 1.2em; font-size: 1.07em;
+                font-weight: bold; margin-bottom: 0.5em; margin-top: -0.2em;'>
+        Gastos estimados: {gastos_compra_eur:,.0f} €
+    </div>
+    """,
+    unsafe_allow_html=True)
     tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco%")
     plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años, normalmente entre 20 y 30 años.")
     revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 4.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 4% y el 5% anual, pero puede variar según zona y mercado.")
