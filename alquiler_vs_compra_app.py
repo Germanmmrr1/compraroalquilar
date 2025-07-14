@@ -184,6 +184,13 @@ elif st.session_state.step == 3:
     alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Cuánto pagas de alquiler actualmente.")
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Porcentaje esperado de incremento anual del alquiler.")
     rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
+    horizonte_anios = st.slider(
+        "Horizonte de análisis (años)",
+        1,
+        40,
+        25,
+        help="Número de años para comparar compra y alquiler.",
+    )
 
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="alquiler_back"):
@@ -192,7 +199,8 @@ elif st.session_state.step == 3:
         st.session_state.alquiler = {
             "alquiler_inicial": alquiler_inicial,
             "subida_alquiler_anual_pct": subida_alquiler_anual_pct,
-            "rentabilidad_inversion_pct": rentabilidad_inversion_pct
+            "rentabilidad_inversion_pct": rentabilidad_inversion_pct,
+            "horizonte_anios": horizonte_anios,
         }
         cambiar_paso(4)
 
@@ -221,7 +229,8 @@ elif st.session_state.step == 4:
     alquiler_labels = {
         "alquiler_inicial": "Alquiler mensual (€)",
         "subida_alquiler_anual_pct": "Subida anual alquiler (%)",
-        "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)"
+        "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)",
+        "horizonte_anios": "Horizonte (años)",
     }
     for key, label in alquiler_labels.items():
         value = st.session_state.alquiler.get(key, "-")
@@ -349,6 +358,13 @@ elif st.session_state.step == 5:
             a.get('rentabilidad_inversion_pct', 12.0),
             key="res_rentabilidad_inversion_pct",
         )
+        a['horizonte_anios'] = st.slider(
+            "Horizonte de análisis (años)",
+            1,
+            40,
+            a.get('horizonte_anios', c.get('plazo_hipoteca', 25)),
+            key="res_horizonte_anios",
+        )
 
     # Guardar cambios
     st.session_state.compra = c
@@ -366,7 +382,7 @@ elif st.session_state.step == 5:
     subida_alquiler_anual_pct = a['subida_alquiler_anual_pct']
     rentabilidad_inversion_pct = a['rentabilidad_inversion_pct']
 
-    horizonte_anios = c.get('plazo_hipoteca', 25)
+    horizonte_anios = a.get('horizonte_anios', c.get('plazo_hipoteca', 25))
     gasto_propietario_pct = c.get('gasto_propietario_pct', 0.0)
     seguro_hogar_pct = 0.0
     seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
