@@ -5,6 +5,48 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+st.markdown("""
+    <style>
+    /* Oculta los anchor-link de los encabezados */
+    h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link {
+        display: none !important;
+    }
+    /* Streamlit v1.25+ usa esta clase: */
+    .stMarkdown .css-1wvsk4q {
+        display: none !important;
+    }
+    /* Algunos temas usan: */
+    a[href^="#"] {
+        display: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    .stButton > button {
+        font-size: 1.25em !important;
+        font-weight: bold;
+        padding: 0.7em 2.8em !important;
+        border-radius: 1.3em;
+        background-color: #19A974 !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        min-width: 240px;
+        max-width: 350px;
+        width: 100%;
+        white-space: nowrap;
+        text-align: center;
+        margin-top: 1.2em;
+        transition: background 0.2s;
+    }
+    .stButton > button:hover {
+        background-color: #146953 !important;
+        color: #fff !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 hide_menu_style = """
     <style>
     #MainMenu {visibility: hidden;}
