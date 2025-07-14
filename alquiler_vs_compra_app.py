@@ -516,124 +516,124 @@ elif st.session_state.step == 5:
         coste_alquiler_acumulado.append(coste_a)
 
     # --- Calcular valores finales para mostrar en cajas resumen ---
-desembolso_inicial_compra = entrada + gastos_compra
-costes_compra = coste_compra_acumulado[-1]
-valor_prop_final = valor_vivienda[-1]
-hipoteca_pendiente = deuda_pendiente[-1]
-patrimonio_neto_final = patrimonio_compra[-1]
+    desembolso_inicial_compra = entrada + gastos_compra
+    costes_compra = coste_compra_acumulado[-1]
+    valor_prop_final = valor_vivienda[-1]
+    hipoteca_pendiente = deuda_pendiente[-1]
+    patrimonio_neto_final = patrimonio_compra[-1]
 
-inversion_inicial_alq = entrada + gastos_compra
-costes_alquiler = coste_alquiler_acumulado[-1]
-capital_total_invertido = inversion_inquilino
-valor_final_inversion = inversion_alquiler[-1]
-patrimonio_neto_final_alq = valor_final_inversion
+    inversion_inicial_alq = entrada + gastos_compra
+    costes_alquiler = coste_alquiler_acumulado[-1]
+    capital_total_invertido = inversion_inquilino
+    valor_final_inversion = inversion_alquiler[-1]
+    patrimonio_neto_final_alq = valor_final_inversion
 
-# --- Visualización tipo "caja resumen" ---
-st.markdown("""
-<style>
-.res-box {
-    border-radius: 13px;
-    border: 2px solid #dde4ee;
-    padding: 1.25em 1.4em 1em 1.4em;
-    margin-bottom: 1.1em;
-    background: #f4f7fc;
-    min-width: 320px;
-    box-shadow: 0 4px 18px rgba(60,120,220,0.05);
-}
-.res-title {
-    font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
-}
-.res-label { font-weight: 600; color: #222;}
-.res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
-.res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
-.res-title.green { color: #13a656;}
-.res-value.green { color: #13a656;}
-.red { color: #e03a3a; font-weight: bold;}
-.line { border-bottom: 1.1px solid #b0b8c2; margin: 0.6em 0;}
-.final-row {font-size:1.13em; font-weight:900; margin-top:0.7em;}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown(f"<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{horizonte_anios} años</span></h2>", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("<div class='res-box'>", unsafe_allow_html=True)
-    st.markdown("<div class='res-title'><span style='color:#1c6cb8;'>🏠 Opción Compra</span></div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Desembolso inicial total:</span><span class='res-value'>{desembolso_inicial_compra:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Costes totales acumulados:</span><span class='res-value'>{costes_compra:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Valor estimado propiedad:</span><span class='res-value'>{valor_prop_final:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Hipoteca pendiente:</span><span class='res-value red'>{hipoteca_pendiente:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("<div class='line'></div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value'>{patrimonio_neto_final:,.0f} €</span></div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("<div class='res-box green'>", unsafe_allow_html=True)
-    st.markdown("<div class='res-title green'>🔑 Opción Alquiler + Inversión</div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Inversión inicial:</span><span class='res-value green'>{inversion_inicial_alq:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Costes alquiler acumulados:</span><span class='res-value green'>{costes_alquiler:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Capital total invertido (acumulado):</span><span class='res-value green'>{capital_total_invertido:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Valor final inversión:</span><span class='res-value green'>{valor_final_inversion:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("<div class='line'></div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value green'>{patrimonio_neto_final_alq:,.0f} €</span></div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.subheader("📈 Evolución del patrimonio")
-    fig, ax = plt.subplots()
-    ax.plot(anios, patrimonio_compra, label="Compra")
-    ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
-    ax.set_xlabel("Años")
-    ax.set_ylabel("Patrimonio (€)")
-    ax.legend()
-    st.pyplot(fig)
-
-    st.subheader("💸 Coste acumulado")
-    fig2, ax2 = plt.subplots()
-    ax2.plot(anios, coste_compra_acumulado, label="Coste Compra")
-    ax2.plot(anios, coste_alquiler_acumulado, label="Coste Alquiler")
-    ax2.set_xlabel("Años")
-    ax2.set_ylabel("Coste acumulado (€)")
-    ax2.legend()
-    st.pyplot(fig2)
-
-    df_resultados = pd.DataFrame({
-        "Año": anios,
-        "Valor Vivienda (€)": valor_vivienda,
-        "Deuda Pendiente (€)": deuda_pendiente,
-        "Patrimonio Compra (€)": patrimonio_compra,
-        "Inversión Alquiler (€)": inversion_alquiler,
-        "Coste Compra (€)": coste_compra_acumulado,
-        "Coste Alquiler (€)": coste_alquiler_acumulado,
-    })
-
-    if "email_confirmed" not in st.session_state:
-        st.session_state.email_confirmed = False
-
-    st.subheader("📧 Descarga de resultados")
-    if not st.session_state.email_confirmed:
-        email = st.text_input(
-            "Introduce tu email para descargar los resultados",
-            key="email_input",
-        )
-        if st.button("Enviar email", key="send_email"):
-            if email:
-                try:
-                    email_path = os.path.join(os.path.dirname(__file__), "emails.txt")
-                    with open(email_path, "a") as f:
-                        f.write(email + "\n")
-                    st.session_state.email_confirmed = True
-                    st.success("Descarga habilitada.")
-                except Exception as e:
-                    st.error(f"Error al guardar el email: {e}")
-            else:
-                st.warning("Por favor ingresa un email válido.")
-
-    if st.session_state.email_confirmed:
-        st.download_button(
-            "📥 Descargar resultados como CSV",
-            df_resultados.to_csv(index=False),
-            "alquiler_vs_compra_resultados.csv",
-            "text/csv",
-        )
+    # --- Visualización tipo "caja resumen" ---
+    st.markdown("""
+    <style>
+    .res-box {
+        border-radius: 13px;
+        border: 2px solid #dde4ee;
+        padding: 1.25em 1.4em 1em 1.4em;
+        margin-bottom: 1.1em;
+        background: #f4f7fc;
+        min-width: 320px;
+        box-shadow: 0 4px 18px rgba(60,120,220,0.05);
+    }
+    .res-title {
+        font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
+    }
+    .res-label { font-weight: 600; color: #222;}
+    .res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
+    .res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
+    .res-title.green { color: #13a656;}
+    .res-value.green { color: #13a656;}
+    .red { color: #e03a3a; font-weight: bold;}
+    .line { border-bottom: 1.1px solid #b0b8c2; margin: 0.6em 0;}
+    .final-row {font-size:1.13em; font-weight:900; margin-top:0.7em;}
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{horizonte_anios} años</span></h2>", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("<div class='res-box'>", unsafe_allow_html=True)
+        st.markdown("<div class='res-title'><span style='color:#1c6cb8;'>🏠 Opción Compra</span></div>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Desembolso inicial total:</span><span class='res-value'>{desembolso_inicial_compra:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Costes totales acumulados:</span><span class='res-value'>{costes_compra:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Valor estimado propiedad:</span><span class='res-value'>{valor_prop_final:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Hipoteca pendiente:</span><span class='res-value red'>{hipoteca_pendiente:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown("<div class='line'></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value'>{patrimonio_neto_final:,.0f} €</span></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("<div class='res-box green'>", unsafe_allow_html=True)
+        st.markdown("<div class='res-title green'>🔑 Opción Alquiler + Inversión</div>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Inversión inicial:</span><span class='res-value green'>{inversion_inicial_alq:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Costes alquiler acumulados:</span><span class='res-value green'>{costes_alquiler:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Capital total invertido (acumulado):</span><span class='res-value green'>{capital_total_invertido:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Valor final inversión:</span><span class='res-value green'>{valor_final_inversion:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown("<div class='line'></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value green'>{patrimonio_neto_final_alq:,.0f} €</span></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+        st.subheader("📈 Evolución del patrimonio")
+        fig, ax = plt.subplots()
+        ax.plot(anios, patrimonio_compra, label="Compra")
+        ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
+        ax.set_xlabel("Años")
+        ax.set_ylabel("Patrimonio (€)")
+        ax.legend()
+        st.pyplot(fig)
+    
+        st.subheader("💸 Coste acumulado")
+        fig2, ax2 = plt.subplots()
+        ax2.plot(anios, coste_compra_acumulado, label="Coste Compra")
+        ax2.plot(anios, coste_alquiler_acumulado, label="Coste Alquiler")
+        ax2.set_xlabel("Años")
+        ax2.set_ylabel("Coste acumulado (€)")
+        ax2.legend()
+        st.pyplot(fig2)
+    
+        df_resultados = pd.DataFrame({
+            "Año": anios,
+            "Valor Vivienda (€)": valor_vivienda,
+            "Deuda Pendiente (€)": deuda_pendiente,
+            "Patrimonio Compra (€)": patrimonio_compra,
+            "Inversión Alquiler (€)": inversion_alquiler,
+            "Coste Compra (€)": coste_compra_acumulado,
+            "Coste Alquiler (€)": coste_alquiler_acumulado,
+        })
+    
+        if "email_confirmed" not in st.session_state:
+            st.session_state.email_confirmed = False
+    
+        st.subheader("📧 Descarga de resultados")
+        if not st.session_state.email_confirmed:
+            email = st.text_input(
+                "Introduce tu email para descargar los resultados",
+                key="email_input",
+            )
+            if st.button("Enviar email", key="send_email"):
+                if email:
+                    try:
+                        email_path = os.path.join(os.path.dirname(__file__), "emails.txt")
+                        with open(email_path, "a") as f:
+                            f.write(email + "\n")
+                        st.session_state.email_confirmed = True
+                        st.success("Descarga habilitada.")
+                    except Exception as e:
+                        st.error(f"Error al guardar el email: {e}")
+                else:
+                    st.warning("Por favor ingresa un email válido.")
+    
+        if st.session_state.email_confirmed:
+            st.download_button(
+                "📥 Descargar resultados como CSV",
+                df_resultados.to_csv(index=False),
+                "alquiler_vs_compra_resultados.csv",
+                "text/csv",
+            )
