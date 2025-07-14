@@ -141,19 +141,45 @@ if st.session_state.step == 1:
 elif st.session_state.step == 2:
     st.markdown("<div class='step-header'>🏠 Paso 1 de 3: Datos de Compra</div>", unsafe_allow_html=True)
     precio_vivienda = st.number_input("💰 Precio de la vivienda (€)", 50000, 1000000, 250000, step=10000, help="El precio de la vivienda incluye todos los gastos asociados como reformas y muebles iniciales.")
-    entrada_pct = st.slider("Entrada (%)", 0, 50, 20, help="Porcentaje del precio total que pagarás como entrada.")
-    gastos_compra_pct = st.slider("Gastos de compra (%)", 0, 15, 10, help="Costes adicionales como notaría, impuestos, registro.")
-    tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, help="Tipo de interés anual de la hipoteca.")
-    plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años.")
-    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 5.5, help="Aumento esperado en el valor de la vivienda por año.")
+    
+    # Calcula la entrada en euros después de elegir el porcentaje
+    entrada_pct = st.slider("Entrada para la hipoteca (%)", 0, 50, 20, help="Normalmente entre el 20 y el 30%.")
+    entrada_eur = precio_vivienda * entrada_pct / 100
 
-    gasto_propietario_pct = st.number_input("Gastos propietario anuales (% valor vivienda)", 0.0, 5.0, 1.5, help="Mantenimiento, comunidad, IBI, etc.")
+    # Badge de entrada en euros
+    st.markdown(
+        f"""
+        <div style='display: inline-block; background: #e3f2fd; color: #1565c0;
+                    border-radius: 12px; padding: 0.35em 1.3em; font-size: 1.1em;
+                    font-weight: bold; margin-bottom: 0.6em; margin-top: -0.5em;'>
+            Entrada: {entrada_eur:,.0f} €
+        </div>
+        """, unsafe_allow_html=True
+    )
 
-    incluir_seguro_hogar = st.checkbox("Incluir seguro de hogar", value=True)
-    if incluir_seguro_hogar:
-        seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro del hogar.")
-    else:
-        seguro_hogar_eur = 0.0
+    gastos_compra_pct = st.slider(
+    "Gastos de compra (%)",
+    0, 15, 10,
+    help="Incluye costes de:\n"
+         "• Notaría (0,2%–0,5%)\n"
+         "• Registro (0,1%–0,3%)\n"
+         "• Gestoría (300–500 €, tarifa habitual)\n"
+         "• Impuestos: 10% IVA (obra nueva) o 6–10% ITP (2ª mano, según CCAA)\n"
+         "• Tasación (300–600 €, si hay hipoteca)\n"
+         "• Comisión apertura hipoteca (0%–1%)")
+    tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco%")
+    plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años, normalmente entre 20 y 30 años.")
+    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 4.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 4% y el 5% anual, pero puede variar según zona y mercado.")
+    gasto_propietario_pct = st.number_input(
+    "Gastos propietario anuales (% valor vivienda)",
+    0.0, 5.0, 1.5,
+    help="Incluye la suma estimada de:\n"
+         "• IBI anual (700 € aprox., suele oscilar entre 0,4% y 1,1% del valor catastral según municipio)\n"
+         "• Comunidad (80 €/mes aprox., varía según servicios y tipo de edificio)\n"
+         "• Mantenimiento (100 €/mes aprox., pequeñas reparaciones, electrodomésticos, pintura, etc.)\n"
+         "• Tasa de basuras (120 €/año aprox., impuesto municipal por recogida de residuos)\n"
+         "Puedes ajustar este porcentaje para que refleje el coste real de tu caso.")
+    seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro del hogar.")
 
     incluir_seguro_vida = st.checkbox("Incluir seguro de vida", value=True)
     if incluir_seguro_vida:
@@ -181,9 +207,16 @@ elif st.session_state.step == 2:
 # Paso 3: Variables de Alquiler
 elif st.session_state.step == 3:
     st.markdown("<div class='step-header'>🏡 Paso 2 de 3: Datos de Alquiler</div>", unsafe_allow_html=True)
-    alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Cuánto pagas de alquiler actualmente.")
-    subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Porcentaje esperado de incremento anual del alquiler.")
-    rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
+    alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Precio de alquiler de propiedades parecidas en la zona.")
+    subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Incremento estimado del alquiler cada año, normalmente similar al IPC (Índice de Precios al Consumidor), con valores habituales entre el 2% y el 3%. El aumento se calcula de forma compuesta.")
+    rentabilidad_inversion_pct = st.number_input(
+    "Rentabilidad inversión anual (%)",
+    0.0, 20.0, 10.0,help="Rentabilidad media anual estimada al invertir el dinero ahorrado en fondos o activos globales.\n"
+         "Ejemplos históricos:\n"
+         "• MSCI World: ~8% anual\n"
+         "• S&P 500: ~10% anual\n"
+         "• Oro: ~6% anual\n"
+         "Puedes ajustar este valor según tu perfil y horizonte de inversión.")
     horizonte_anios = st.slider(
         "Horizonte de análisis (años)", 1, 40, 25, help="Número de años para comparar compra y alquiler.",)
 
@@ -296,13 +329,7 @@ elif st.session_state.step == 5:
             c.get('gasto_propietario_pct', 1.5),
             key="res_gasto_propietario_pct",
         )
-        incluir_seguro_hogar = st.checkbox(
-            "Incluir seguro de hogar",
-            value=c.get('seguro_hogar_eur', 0.0) > 0,
-            key="res_incluir_seguro_hogar",
-        )
-        if incluir_seguro_hogar:
-            c['seguro_hogar_eur'] = st.number_input(
+        c['seguro_hogar_eur'] = st.number_input(
                 "Seguro hogar anual fijo (€)",
                 0.0,
                 5000.0,
@@ -310,9 +337,6 @@ elif st.session_state.step == 5:
                 step=50.0,
                 key="res_seguro_hogar_eur",
             )
-        else:
-            c['seguro_hogar_eur'] = 0.0
-
         incluir_seguro_vida = st.checkbox(
             "Incluir seguro de vida",
             value=c.get('seguro_vida_eur', 0.0) > 0,
