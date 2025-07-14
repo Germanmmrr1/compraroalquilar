@@ -4,6 +4,19 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+hide_menu_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    header [data-testid="stToolbar"] {visibility: hidden;}
+    [data-testid="github-badge"] {display: none !important;}
+    .viewerBadge_link__ {display: none !important;}
+    .viewerBadge_container__ {display: none !important;}
+    footer {visibility: hidden;}
+    </style>
+"""
+import streamlit as st
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+
 # Set Streamlit page configuration
 st.set_page_config(page_title="Alquiler vs Compra", layout="centered")
 
