@@ -71,8 +71,8 @@ if st.session_state.step == 1:
     )
     col1, col2, col3 = st.columns([2, 1, 2])
     with col2:
-    if st.button("👉 Empezar encuesta", key="start"):
-        cambiar_paso(2)
+        if st.button("👉 Empezar encuesta", key="start"):
+            cambiar_paso(2)
 
 # Paso 2: Variables de Compra
 elif st.session_state.step == 2:
