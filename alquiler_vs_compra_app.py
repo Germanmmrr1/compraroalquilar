@@ -497,17 +497,16 @@ elif st.session_state.step == 5:
     for year in anios:
         if year > 1:
             valor_inversion += aportacion_anual
-        capital_invertido += aportacion_anual
-    valor_inversion *= (1 + rentabilidad_inversion_pct / 100)
-    capital_total_invertido_arr.append(capital_invertido)
-    valor_final_inversion_arr.append(valor_inversion)
+            capital_invertido += aportacion_anual
+            valor_inversion *= (1 + rentabilidad_inversion_pct / 100)
+            capital_total_invertido_arr.append(capital_invertido)
+            valor_final_inversion_arr.append(valor_inversion)
 
         coste_c = entrada + gastos_compra + cuota_mensual * 12 * min(year, plazo_hipoteca)
         coste_c += precio_vivienda * gasto_propietario_pct / 100 * year
         coste_c += (precio_vivienda * seguro_hogar_pct / 100 + seguro_hogar_eur) * year
         coste_c += (capital_financiado * seguro_vida_pct / 100 + seguro_vida_eur) * min(year, plazo_hipoteca)
         coste_compra_acumulado.append(coste_c)
-
         coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
         coste_alquiler_acumulado.append(coste_a)
 
