@@ -165,12 +165,122 @@ elif st.session_state.step == 4:
 # Paso 5: Mostrar herramienta interactiva
 elif st.session_state.step == 5:
     st.success("✅ Datos completados. Ahora puedes ajustar variables y ver resultados interactivos.")
-    
+
     # Cargar variables desde la sesión
     c = st.session_state.compra
     a = st.session_state.alquiler
 
-    # Variables
+    # Permitir modificar los datos directamente en esta pantalla
+    with st.expander("🔧 Editar datos de compra"):
+        c['precio_vivienda'] = st.number_input(
+            "💰 Precio de la vivienda (€)",
+            50000,
+            1000000,
+            c.get('precio_vivienda', 250000),
+            step=10000,
+            key="res_precio_vivienda",
+        )
+        c['entrada_pct'] = st.slider(
+            "Entrada (%)", 0, 50, c.get('entrada_pct', 20), key="res_entrada_pct"
+        )
+        c['gastos_compra_pct'] = st.slider(
+            "Gastos de compra (%)",
+            0,
+            15,
+            c.get('gastos_compra_pct', 10),
+            key="res_gastos_compra_pct",
+        )
+        c['tipo_interes_hipoteca'] = st.number_input(
+            "Interés hipoteca (%)",
+            0.1,
+            10.0,
+            c.get('tipo_interes_hipoteca', 2.5),
+            key="res_tipo_interes_hipoteca",
+        )
+        c['plazo_hipoteca'] = st.slider(
+            "Plazo hipoteca (años)",
+            5,
+            40,
+            c.get('plazo_hipoteca', 25),
+            key="res_plazo_hipoteca",
+        )
+        c['revalorizacion_vivienda_pct'] = st.number_input(
+            "Revalorización vivienda anual (%)",
+            -5.0,
+            15.0,
+            c.get('revalorizacion_vivienda_pct', 5.5),
+            key="res_revalorizacion_vivienda_pct",
+        )
+        c['gasto_propietario_pct'] = st.number_input(
+            "Gastos propietario anuales (% valor vivienda)",
+            0.0,
+            5.0,
+            c.get('gasto_propietario_pct', 1.5),
+            key="res_gasto_propietario_pct",
+        )
+        incluir_seguro_hogar = st.checkbox(
+            "Incluir seguro de hogar",
+            value=c.get('seguro_hogar_eur', 0.0) > 0,
+            key="res_incluir_seguro_hogar",
+        )
+        if incluir_seguro_hogar:
+            c['seguro_hogar_eur'] = st.number_input(
+                "Seguro hogar anual fijo (€)",
+                0,
+                5000,
+                c.get('seguro_hogar_eur', 0.0),
+                step=50,
+                key="res_seguro_hogar_eur",
+            )
+        else:
+            c['seguro_hogar_eur'] = 0.0
+
+        incluir_seguro_vida = st.checkbox(
+            "Incluir seguro de vida",
+            value=c.get('seguro_vida_eur', 0.0) > 0,
+            key="res_incluir_seguro_vida",
+        )
+        if incluir_seguro_vida:
+            c['seguro_vida_eur'] = st.number_input(
+                "Seguro vida anual fijo (€)",
+                0,
+                5000,
+                c.get('seguro_vida_eur', 0.0),
+                step=50,
+                key="res_seguro_vida_eur",
+            )
+        else:
+            c['seguro_vida_eur'] = 0.0
+
+    with st.expander("🔧 Editar datos de alquiler"):
+        a['alquiler_inicial'] = st.number_input(
+            "💸 Alquiler mensual actual (€)",
+            300,
+            5000,
+            a.get('alquiler_inicial', 800),
+            step=50,
+            key="res_alquiler_inicial",
+        )
+        a['subida_alquiler_anual_pct'] = st.number_input(
+            "Subida anual alquiler (%)",
+            0.0,
+            10.0,
+            a.get('subida_alquiler_anual_pct', 2.0),
+            key="res_subida_alquiler_anual_pct",
+        )
+        a['rentabilidad_inversion_pct'] = st.number_input(
+            "Rentabilidad inversión anual (%)",
+            0.0,
+            20.0,
+            a.get('rentabilidad_inversion_pct', 12.0),
+            key="res_rentabilidad_inversion_pct",
+        )
+
+    # Guardar cambios
+    st.session_state.compra = c
+    st.session_state.alquiler = a
+
+    # Variables actualizadas
     precio_vivienda = c['precio_vivienda']
     entrada_pct = c['entrada_pct']
     gastos_compra_pct = c['gastos_compra_pct']
