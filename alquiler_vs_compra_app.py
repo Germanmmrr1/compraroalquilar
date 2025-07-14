@@ -204,7 +204,7 @@ elif st.session_state.step == 6:
             15,
             c.get('gastos_compra_pct', 10),
             key="res_gastos_compra_pct",
-@@ -243,117 +269,127 @@ elif st.session_state.step == 5:
+
             c.get('plazo_hipoteca', 25),
             key="res_plazo_hipoteca",
         )
