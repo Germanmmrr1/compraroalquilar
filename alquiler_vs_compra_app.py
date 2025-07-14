@@ -5,6 +5,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+st.markdown("""
+    <style>
+    .stButton>button {
+        font-size: 1.2em !important;
+        padding: 0.7em 2.2em;
+        border-radius: 1.5em;
+        background-color: #19A974 !important;
+        color: white !important;
+        font-weight: bold;
+        margin-top: 1.1em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s;
+    }
+    .stButton>button:hover {
+        background-color: #146953 !important;
+        color: #fff !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
 hide_menu_style = """
     <style>
     #MainMenu {visibility: hidden;}
@@ -71,7 +92,7 @@ if st.session_state.step == 1:
     )
     col1, col2, col3 = st.columns([2, 1, 2])
     with col2:
-        if st.button("👉 Empezar encuesta", key="start"):
+        if st.button("🚀 ¡Empieza el análisis!", key="start"):
             cambiar_paso(2)
 
 # Paso 2: Variables de Compra
