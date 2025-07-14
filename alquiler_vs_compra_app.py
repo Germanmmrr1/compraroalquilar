@@ -557,11 +557,6 @@ elif st.session_state.step == 5:
     col1, col2 = st.columns(2)
     col1.metric("🏠 Patrimonio compra final (€)", f"{patrimonio_compra[-1]:,.0f}")
     col2.metric("🏡 Patrimonio alquiler final (€)", f"{inversion_alquiler[-1]:,.0f}")  
- col1, col2 = st.columns(2)
-    col1.metric("🏠 Patrimonio compra final (€)", f"{patrimonio_compra[-1]:,.0f}")
-    col2.metric("🏡 Patrimonio alquiler final (€)", f"{inversion_alquiler[-1]:,.0f}")
-
-
 
     st.subheader("📈 Evolución del patrimonio")
     fig, ax = plt.subplots()
