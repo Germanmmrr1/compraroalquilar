@@ -22,6 +22,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
 st.markdown("""
     <style>
     .stButton > button {
@@ -46,6 +47,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 hide_menu_style = """
     <style>
@@ -73,7 +75,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 Análisis Interactivo: Alquiler vs Compra")
+st.title("¿Comprar o alquilar casa?")
 
 # Estado inicial de pasos
 if "step" not in st.session_state:
@@ -81,7 +83,7 @@ if "step" not in st.session_state:
 
 # Barra de progreso visual mejorada
 total_steps = 4
-step_labels = ["Inicio", "Compra", "Alquiler", "Confirmación", "Resultados"]
+step_labels = ["Inicio", "Compra", "Alquiler", "Revisión", "Resultados"]
 progress_value = (st.session_state.step - 1) / total_steps
 st.markdown(f"""
 <div style='width: 100%; display: flex; justify-content: space-between; margin-bottom:10px;'>
@@ -99,18 +101,27 @@ def cambiar_paso(siguiente):
 
 # Paso 1: Introducción
 if st.session_state.step == 1:
-    st.markdown("<div class='step-header'>👋 Bienvenido</div>", unsafe_allow_html=True)
-    st.markdown("<div class='big-text'>Esta herramienta te ayudará a comparar si te conviene más comprar o alquilar una vivienda según tus datos. Te guiaremos paso a paso para que configures las variables.</div>", unsafe_allow_html=True)
-    st.markdown("<div class='big-text'>👉 <i>Ejemplo: Si estás considerando una vivienda de 250.000€ y actualmente pagas un alquiler de 800€, introduce esos valores cuando se te pidan.</i></div>", unsafe_allow_html=True)
-    if st.button("👉 Empezar encuesta", key="start"):
-        cambiar_paso(2)
+    st.markdown(
+        """
+        <div class='big-text'>
+        <b>Compara el coste total de comprar frente a alquilar</b> teniendo en cuenta precio, revalorización, gastos, impuestos y más.
+        </div>
+        <ul style='font-size: 1.3em; line-height: 1.7; margin-top: 20px;'>
+            <li>📊 <b>Simula distintos escenarios</b> y visualiza cuál opción te conviene más.</li>
+            <li>🛠️ <b>Ajusta los valores</b> según tu situación real.</li>
+            <li>💡 <b>Toma la mejor decisión financiera</b> en segundos, gratis.</li>
+        </ul>
+        """, unsafe_allow_html=True
+    )
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        if st.button("🚀 ¡Empieza el análisis!", key="start"):
+            cambiar_paso(2)
 
 # Paso 2: Variables de Compra
 elif st.session_state.step == 2:
     st.markdown("<div class='step-header'>🏠 Paso 1 de 3: Datos de Compra</div>", unsafe_allow_html=True)
-    st.markdown("<div class='big-text'>💡 Consejo: El precio de la vivienda incluye todos los gastos asociados como reformas y muebles iniciales.</div>", unsafe_allow_html=True)
-
-    precio_vivienda = st.number_input("💰 Precio de la vivienda (€)", 50000, 1000000, 250000, step=10000, help="Precio total de la vivienda que deseas comprar.")
+    precio_vivienda = st.number_input("💰 Precio de la vivienda (€)", 50000, 1000000, 250000, step=10000, help="El precio de la vivienda incluye todos los gastos asociados como reformas y muebles iniciales.")
     entrada_pct = st.slider("Entrada (%)", 0, 50, 20, help="Porcentaje del precio total que pagarás como entrada.")
     gastos_compra_pct = st.slider("Gastos de compra (%)", 0, 15, 10, help="Costes adicionales como notaría, impuestos, registro.")
     tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, help="Tipo de interés anual de la hipoteca.")
@@ -435,7 +446,7 @@ elif st.session_state.step == 5:
                     with open(email_path, "a") as f:
                         f.write(email + "\n")
                     st.session_state.email_confirmed = True
-                    st.success("Email registrado. Descarga habilitada.")
+                    st.success("Descarga habilitada.")
                 except Exception as e:
                     st.error(f"Error al guardar el email: {e}")
             else:
