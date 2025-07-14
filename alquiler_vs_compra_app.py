@@ -244,38 +244,87 @@ elif st.session_state.step == 3:
 # Paso 4: Confirmación con resumen visual
 elif st.session_state.step == 4:
     st.markdown("<div class='step-header'>📋 Resumen y Confirmación</div>", unsafe_allow_html=True)
-    st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
-    st.markdown("<div class='label'>🏠 Datos de Compra:</div>", unsafe_allow_html=True)
-    compra_labels = {
-        "precio_vivienda": "Precio vivienda (€)",
-        "entrada_pct": "Entrada (%)",
-        "gastos_compra_pct": "Gastos compra (%)",
-        "tipo_interes_hipoteca": "Interés hipoteca (%)",
-        "plazo_hipoteca": "Plazo hipoteca (años)",
-        "revalorizacion_vivienda_pct": "Revalorización vivienda anual (%)",
-        "gasto_propietario_pct": "Gastos propietario anuales (%)",
-        "seguro_hogar_eur": "Seguro hogar anual (€)",
-        "seguro_vida_eur": "Seguro vida anual (€)"
+    
+    # Estilo para las cajas
+    st.markdown("""
+    <style>
+    .summary-box {
+        background: #F8FAFB;
+        border: 2px solid #2DCC70;
+        border-radius: 16px;
+        padding: 1.4em 1.6em 1em 1.6em;
+        margin-bottom: 2em;
+        box-shadow: 0 4px 20px rgba(44,204,112,0.05);
+        max-width: 480px;
     }
-    for key, label in compra_labels.items():
-        value = st.session_state.compra.get(key, "-")
-        st.markdown(f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
-
-    st.markdown("<hr>", unsafe_allow_html=True)
-    st.markdown("<div class='label'>🏡 Datos de Alquiler:</div>", unsafe_allow_html=True)
-    alquiler_labels = {
-        "alquiler_inicial": "Alquiler mensual (€)",
-        "subida_alquiler_anual_pct": "Subida anual alquiler (%)",
-        "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)",
-        "horizonte_anios": "Horizonte (años)",
+    .summary-title {
+        font-size: 1.32em;
+        font-weight: 800;
+        color: #2DCC70;
+        margin-bottom: 0.8em;
+        margin-top: 0.2em;
     }
-    for key, label in alquiler_labels.items():
-        value = st.session_state.alquiler.get(key, "-")
-        st.markdown(f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    .summary-row {
+        font-size: 1.08em;
+        margin-bottom: 0.28em;
+        font-weight: 600;
+    }
+    .summary-label {
+        color: #222;
+        font-weight: 600;
+    }
+    .summary-value {
+        color: #1c6cb8;
+        font-weight: 700;
+        margin-left: 0.2em;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    st.markdown("<div class='big-text'>Si quieres cambiar algo, usa los botones para volver atrás.</div>", unsafe_allow_html=True)
+    cols = st.columns(2)
+    # --- Caja 1: Compra ---
+    with cols[0]:
+        st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
+        st.markdown("<div class='summary-title'>🏠 Datos de Compra</div>", unsafe_allow_html=True)
+        compra_labels = {
+            "precio_vivienda": "Precio vivienda (€)",
+            "entrada_pct": "Entrada (%)",
+            "gastos_compra_pct": "Gastos compra (%)",
+            "tipo_interes_hipoteca": "Interés hipoteca (%)",
+            "plazo_hipoteca": "Plazo hipoteca (años)",
+            "revalorizacion_vivienda_pct": "Revalorización vivienda anual (%)",
+            "gasto_propietario_pct": "Gastos propietario anuales (%)",
+            "seguro_hogar_eur": "Seguro hogar anual (€)",
+            "seguro_vida_eur": "Seguro vida anual (€)"
+        }
+        for key, label in compra_labels.items():
+            value = st.session_state.compra.get(key, "-")
+            st.markdown(
+                f"<div class='summary-row'><span class='summary-label'>{label}:</span> <span class='summary-value'>{value}</span></div>",
+                unsafe_allow_html=True
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- Caja 2: Alquiler ---
+    with cols[1]:
+        st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
+        st.markdown("<div class='summary-title'>🏡 Datos de Alquiler</div>", unsafe_allow_html=True)
+        alquiler_labels = {
+            "alquiler_inicial": "Alquiler mensual (€)",
+            "subida_alquiler_anual_pct": "Subida anual alquiler (%)",
+            "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)",
+            "horizonte_anios": "Horizonte (años)",
+        }
+        for key, label in alquiler_labels.items():
+            value = st.session_state.alquiler.get(key, "-")
+            st.markdown(
+                f"<div class='summary-row'><span class='summary-label'>{label}:</span> <span class='summary-value'>{value}</span></div>",
+                unsafe_allow_html=True
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='big-text' style='margin-top:1em;'>Si quieres cambiar algo, usa los botones para volver atrás.</div>", unsafe_allow_html=True)
+    
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="confirm_back"):
         cambiar_paso(3)
