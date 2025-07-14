@@ -7,6 +7,25 @@ import os
 
 st.markdown("""
     <style>
+    .center-title {
+        text-align: center;
+        font-size: 2.7em;
+        font-weight: 800;
+        margin-bottom: 0.4em;
+        margin-top: 0.5em;
+    }
+    .center-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2.5em;
+        margin-bottom: 0.5em;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
     /* Oculta los anchor-link de los encabezados */
     h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link {
         display: none !important;
