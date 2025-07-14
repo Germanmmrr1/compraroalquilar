@@ -510,56 +510,58 @@ elif st.session_state.step == 5:
         coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
         coste_alquiler_acumulado.append(coste_a)
 
-st.markdown("""
-<style>
-.res-box {
-    border-radius: 13px;
-    border: 2px solid #dde4ee;
-    padding: 1.25em 1.4em 1em 1.4em;
-    margin-bottom: 1.1em;
-    background: #f4f7fc;
-    min-width: 320px;
-    box-shadow: 0 4px 18px rgba(60,120,220,0.05);
-}
-.res-title {
-    font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
-}
-.res-label { font-weight: 600; color: #222;}
-.res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
-.res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
-.res-title.green { color: #13a656;}
-.res-value.green { color: #13a656;}
-.red { color: #e03a3a; font-weight: bold;}
-.line { border-bottom: 1.1px solid #b0b8c2; margin: 0.6em 0;}
-.final-row {font-size:1.13em; font-weight:900; margin-top:0.7em;}
-</style>
-""", unsafe_allow_html=True)
+ # --- Cálculos ---
+    entrada = precio_vivienda * entrada_pct / 100
+    gastos_compra = precio_vivienda * gastos_compra_pct / 100
+    capital_financiado = precio_vivienda * (100 - entrada_pct) / 100
 
-col1, col2 = st.columns(2)
+    tipo_mensual = tipo_interes_hipoteca / 100 / 12
+    n_meses = plazo_hipoteca * 12
+    cuota_mensual = npf.pmt(tipo_mensual, n_meses, -capital_financiado)
 
-# --- Compra ---
-with col1:
-    st.markdown("<div class='res-box'>", unsafe_allow_html=True)
-    st.markdown("<div class='res-title'><span style='color:#1c6cb8;'>🏠 Opción Compra</span></div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Desembolso inicial total:</span><span class='res-value'>{desembolso_inicial_compra:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Costes totales acumulados:</span><span class='res-value'>{costes_compra:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Valor estimado propiedad:</span><span class='res-value'>{valor_prop_final:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Hipoteca pendiente:</span><span class='res-value red'>{hipoteca_pendiente:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("<div class='line'></div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Patrimonio Neto Final:</span><span class='res-value'>{patrimonio_neto_nominal:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    anios = list(range(1, horizonte_anios + 1))
+    valor_vivienda = []
+    deuda_pendiente = []
+    patrimonio_compra = []
+    inversion_alquiler = []
+    coste_compra_acumulado = []
+    coste_alquiler_acumulado = []
 
-# --- Alquiler + Inversión ---
-with col2:
-    st.markdown("<div class='res-box green'>", unsafe_allow_html=True)
-    st.markdown("<div class='res-title green'>🔑 Opción Alquiler + Inversión</div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Inversión inicial:</span><span class='res-value green'>{inversion_inicial_alq:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Costes alquiler acumulados:</span><span class='res-value green'>{costes_alquiler:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Capital total invertido (Inicial + Aportes):</span><span class='res-value green'>{capital_total_invertido:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Valor final inversión:</span><span class='res-value green'>{valor_final_inversion:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("<div class='line'></div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='res-label'>Patrimonio Neto Final:</span><span class='res-value green'>{patrimonio_neto_nominal_alq:,.0f} €</span>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    inversion_inquilino = entrada + gastos_compra
+
+    for year in anios:
+        valor_actual_vivienda = precio_vivienda * (1 + revalorizacion_vivienda_pct / 100) ** year
+        valor_vivienda.append(valor_actual_vivienda)
+        amortizacion = min(1.0, year / plazo_hipoteca)
+        deuda_actual = capital_financiado * (1 - amortizacion)
+        deuda_pendiente.append(deuda_actual)
+        patrimonio_actual = valor_actual_vivienda - deuda_actual
+        patrimonio_compra.append(patrimonio_actual)
+
+        inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
+        inversion_inquilino += (precio_vivienda * gasto_propietario_pct / 100 +
+                                precio_vivienda * seguro_hogar_pct / 100 +
+                                deuda_actual * seguro_vida_pct / 100 +
+                                seguro_hogar_eur + seguro_vida_eur)
+        inversion_alquiler.append(inversion_inquilino)
+
+        coste_c = entrada + gastos_compra + cuota_mensual * 12 * min(year, plazo_hipoteca)
+        coste_c += precio_vivienda * gasto_propietario_pct / 100 * year
+        coste_c += (precio_vivienda * seguro_hogar_pct / 100 + seguro_hogar_eur) * year
+        coste_c += (capital_financiado * seguro_vida_pct / 100 + seguro_vida_eur) * min(year, plazo_hipoteca)
+        coste_compra_acumulado.append(coste_c)
+
+        coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
+        coste_alquiler_acumulado.append(coste_a)
+
+    col1, col2 = st.columns(2)
+    col1.metric("🏠 Patrimonio compra final (€)", f"{patrimonio_compra[-1]:,.0f}")
+    col2.metric("🏡 Patrimonio alquiler final (€)", f"{inversion_alquiler[-1]:,.0f}")  
+ col1, col2 = st.columns(2)
+    col1.metric("🏠 Patrimonio compra final (€)", f"{patrimonio_compra[-1]:,.0f}")
+    col2.metric("🏡 Patrimonio alquiler final (€)", f"{inversion_alquiler[-1]:,.0f}")
+
+
 
     st.subheader("📈 Evolución del patrimonio")
     fig, ax = plt.subplots()
