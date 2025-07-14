@@ -7,6 +7,24 @@ import os
 
 st.markdown("""
     <style>
+    /* Oculta los anchor-link de los encabezados */
+    h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link {
+        display: none !important;
+    }
+    /* Streamlit v1.25+ usa esta clase: */
+    .stMarkdown .css-1wvsk4q {
+        display: none !important;
+    }
+    /* Algunos temas usan: */
+    a[href^="#"] {
+        display: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
+st.markdown("""
+    <style>
     .stButton > button {
         font-size: 1.25em !important;
         font-weight: bold;
