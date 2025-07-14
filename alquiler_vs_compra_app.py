@@ -64,8 +64,8 @@ if "step" not in st.session_state:
     st.session_state.step = 1
 
 # Barra de progreso visual mejorada
-total_steps = 4
-step_labels = ["Inicio", "Compra", "Alquiler", "Revisión", "Resultados"]
+total_steps = 5
+step_labels = ["Inicio", "Compra", "Alquiler", "Horizonte", "Revisión", "Resultados"]
 progress_value = (st.session_state.step - 1) / total_steps
 st.markdown(f"""
 <div style='width: 100%; display: flex; justify-content: space-between; margin-bottom:10px;'>
@@ -102,7 +102,7 @@ if st.session_state.step == 1:
 
 # Paso 2: Variables de Compra
 elif st.session_state.step == 2:
-    st.markdown("<div class='step-header'>🏠 Paso 1 de 3: Datos de Compra</div>", unsafe_allow_html=True)
+    st.markdown("<div class='step-header'>🏠 Paso 1 de 4: Datos de Compra</div>", unsafe_allow_html=True)
     st.markdown("<div class='big-text'>💡 Consejo: El precio de la vivienda incluye todos los gastos asociados como reformas y muebles iniciales.</div>", unsafe_allow_html=True)
 
     precio_vivienda = st.number_input("💰 Precio de la vivienda (€)", 50000, 1000000, 250000, step=10000, help="Precio total de la vivienda que deseas comprar.")
@@ -116,13 +116,13 @@ elif st.session_state.step == 2:
 
     incluir_seguro_hogar = st.checkbox("Incluir seguro de hogar", value=True)
     if incluir_seguro_hogar:
-        seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro del hogar.")
+        seguro_hogar_eur = st.number_input("Seguro hogar anual fijo (€)", 0.0, 5000.0, 0.0, step=50.0, help="Coste anual del seguro del hogar.")
     else:
         seguro_hogar_eur = 0.0
 
     incluir_seguro_vida = st.checkbox("Incluir seguro de vida", value=True)
     if incluir_seguro_vida:
-        seguro_vida_eur = st.number_input("Seguro vida anual fijo (€)", 0, 5000, 0, step=50, help="Coste anual del seguro de vida.")
+        seguro_vida_eur = st.number_input("Seguro vida anual fijo (€)", 0.0, 5000.0, 0.0, step=50.0, help="Coste anual del seguro de vida.")
     else:
         seguro_vida_eur = 0.0
 
@@ -145,7 +145,7 @@ elif st.session_state.step == 2:
 
 # Paso 3: Variables de Alquiler
 elif st.session_state.step == 3:
-    st.markdown("<div class='step-header'>🏡 Paso 2 de 3: Datos de Alquiler</div>", unsafe_allow_html=True)
+    st.markdown("<div class='step-header'>🏡 Paso 2 de 4: Datos de Alquiler</div>", unsafe_allow_html=True)
     alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Cuánto pagas de alquiler actualmente.")
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Porcentaje esperado de incremento anual del alquiler.")
     rentabilidad_inversion_pct = st.number_input("Rentabilidad inversión anual (%)", 0.0, 20.0, 12.0, help="Rentabilidad media de invertir el dinero ahorrado.")
@@ -161,9 +161,26 @@ elif st.session_state.step == 3:
         }
         cambiar_paso(4)
 
-# Paso 4: Confirmación con resumen visual
+# Paso 4: Horizonte de comparación
 elif st.session_state.step == 4:
-    st.markdown("<div class='step-header'>📋 Resumen y Confirmación</div>", unsafe_allow_html=True)
+    st.markdown("<div class='step-header'>⏳ Paso 3 de 4: Horizonte de comparación</div>", unsafe_allow_html=True)
+    horizonte = st.number_input(
+        "Horizonte de comparación (años)",
+        1,
+        50,
+        st.session_state.get('horizonte', 25),
+        step=1,
+    )
+    col1, col2 = st.columns(2)
+    if col1.button("⬅️ Volver", key="horizonte_back"):
+        cambiar_paso(3)
+    if col2.button("Siguiente ➡️", key="horizonte_next"):
+        st.session_state.horizonte = horizonte
+        cambiar_paso(5)
+
+# Paso 5: Confirmación con resumen visual
+elif st.session_state.step == 5:
+    st.markdown("<div class='step-header'>📋 Paso 4 de 4: Resumen y Confirmación</div>", unsafe_allow_html=True)
     st.markdown("<div class='summary-box'>", unsafe_allow_html=True)
     st.markdown("<div class='label'>🏠 Datos de Compra:</div>", unsafe_allow_html=True)
     compra_labels = {
@@ -190,19 +207,28 @@ elif st.session_state.step == 4:
     }
     for key, label in alquiler_labels.items():
         value = st.session_state.alquiler.get(key, "-")
-        st.markdown(f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='big-text'><span class='label'>{label}:</span> <span class='value'>{value}</span></div>",
+            unsafe_allow_html=True,
+        )
     st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div class='big-text'><span class='label'>⏳ Horizonte de comparación (años):</span> <span class='value'>{st.session_state.get('horizonte', 25)}</span></div>",
+        unsafe_allow_html=True,
+    )
 
     st.markdown("<div class='big-text'>Si quieres cambiar algo, usa los botones para volver atrás.</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="confirm_back"):
-        cambiar_paso(3)
+        cambiar_paso(4)
     if col2.button("✅ Confirmar y Ver resultados", key="confirm_next"):
-        cambiar_paso(5)
+        cambiar_paso(6)
 
-# Paso 5: Mostrar herramienta interactiva
-elif st.session_state.step == 5:
+# Paso 6: Mostrar herramienta interactiva
+elif st.session_state.step == 6:
     st.success("✅ Datos completados. Ahora puedes ajustar variables y ver resultados interactivos.")
 
     # Cargar variables desde la sesión
@@ -265,10 +291,10 @@ elif st.session_state.step == 5:
         if incluir_seguro_hogar:
             c['seguro_hogar_eur'] = st.number_input(
                 "Seguro hogar anual fijo (€)",
-                0,
-                5000,
+                0.0,
+                5000.0,
                 c.get('seguro_hogar_eur', 0.0),
-                step=50,
+                step=50.0,
                 key="res_seguro_hogar_eur",
             )
         else:
@@ -282,10 +308,10 @@ elif st.session_state.step == 5:
         if incluir_seguro_vida:
             c['seguro_vida_eur'] = st.number_input(
                 "Seguro vida anual fijo (€)",
-                0,
-                5000,
+                0.0,
+                5000.0,
                 c.get('seguro_vida_eur', 0.0),
-                step=50,
+                step=50.0,
                 key="res_seguro_vida_eur",
             )
         else:
@@ -315,6 +341,16 @@ elif st.session_state.step == 5:
             key="res_rentabilidad_inversion_pct",
         )
 
+    with st.expander("🔧 Editar horizonte de comparación"):
+        st.session_state.horizonte = st.number_input(
+            "Horizonte de comparación (años)",
+            1,
+            50,
+            st.session_state.get('horizonte', horizonte_anios),
+            step=1,
+            key="res_horizonte_anios",
+        )
+
     # Guardar cambios
     st.session_state.compra = c
     st.session_state.alquiler = a
@@ -331,7 +367,7 @@ elif st.session_state.step == 5:
     subida_alquiler_anual_pct = a['subida_alquiler_anual_pct']
     rentabilidad_inversion_pct = a['rentabilidad_inversion_pct']
 
-    horizonte_anios = c.get('plazo_hipoteca', 25)
+    horizonte_anios = st.session_state.get('horizonte', c.get('plazo_hipoteca', 25))
     gasto_propietario_pct = c.get('gasto_propietario_pct', 0.0)
     seguro_hogar_pct = 0.0
     seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
