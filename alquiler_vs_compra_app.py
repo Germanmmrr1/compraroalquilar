@@ -593,7 +593,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(f"<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{horizonte_anios} años</span></h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{horizonte_anios} años</span></h2>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
