@@ -52,7 +52,9 @@ st.markdown(f"""
 # Paso seguro para ir adelante o atrás
 def cambiar_paso(siguiente):
     st.session_state.step = siguiente
-    st.experimental_rerun()
+    # Force Streamlit to rerun immediately after changing steps so only one
+    # click is needed on navigation buttons
+    st.rerun()
 
 # Paso 1: Introducción
 if st.session_state.step == 1:
