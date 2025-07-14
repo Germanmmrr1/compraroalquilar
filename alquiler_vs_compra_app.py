@@ -300,10 +300,10 @@ elif st.session_state.step == 5:
         if incluir_seguro_hogar:
             c['seguro_hogar_eur'] = st.number_input(
                 "Seguro hogar anual fijo (€)",
-                0,
-                5000,
-                c.get('seguro_hogar_eur', 0.0),
-                step=50,
+                0.0,
+                5000.0,
+                float(c.get('seguro_hogar_eur', 0.0)),
+                step=50.0,
                 key="res_seguro_hogar_eur",
             )
         else:
@@ -317,10 +317,10 @@ elif st.session_state.step == 5:
         if incluir_seguro_vida:
             c['seguro_vida_eur'] = st.number_input(
                 "Seguro vida anual fijo (€)",
-                0,
-                5000,
-                c.get('seguro_vida_eur', 0.0),
-                step=50,
+                0.0,
+                5000.0,
+                float(c.get('seguro_vida_eur', 0.0)),
+                step=50.0,
                 key="res_seguro_vida_eur",
             )
         else:
