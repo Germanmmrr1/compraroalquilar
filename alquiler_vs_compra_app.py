@@ -31,7 +31,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 Análisis Interactivo: Alquiler vs Compra")
+st.title("¿Comprar o alquilar casa?")
 
 # Estado inicial de pasos
 if "step" not in st.session_state:
@@ -39,7 +39,7 @@ if "step" not in st.session_state:
 
 # Barra de progreso visual mejorada
 total_steps = 4
-step_labels = ["Inicio", "Compra", "Alquiler", "Confirmación", "Resultados"]
+step_labels = ["Inicio", "Compra", "Alquiler", "Revisión", "Resultados"]
 progress_value = (st.session_state.step - 1) / total_steps
 st.markdown(f"""
 <div style='width: 100%; display: flex; justify-content: space-between; margin-bottom:10px;'>
@@ -57,8 +57,10 @@ def cambiar_paso(siguiente):
 
 # Paso 1: Introducción
 if st.session_state.step == 1:
-    st.markdown("<div class='big-text'>Esta herramienta te ayudará a comparar si te conviene más comprar o alquilar una vivienda según tus datos. Te guiaremos paso a paso para que configures las variables.</div>", unsafe_allow_html=True)
-    st.markdown("<div class='big-text'>👉 <i>Ejemplo: Si estás considerando una vivienda de 250.000€ y actualmente pagas un alquiler de 800€, introduce esos valores cuando se te pidan.</i></div>", unsafe_allow_html=True)
+    st.markdown("<div class='big-text'>Descúbrelo en minutos con esta calculadora interactiva.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='big-text'>Compara el coste total de comprar frente a alquilar teniendo en cuenta precio, revalorización, gastos, impuestos y más.
+Simula distintos escenarios y visualiza gráficamente en qué caso te conviene más comprar o alquilar.
+Ajusta los valores según tu situación y toma la mejor decisión financiera, gratis y en segundos.</div>", unsafe_allow_html=True)
     if st.button("👉 Empezar encuesta", key="start"):
         cambiar_paso(2)
 
