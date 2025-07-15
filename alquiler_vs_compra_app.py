@@ -184,6 +184,21 @@ elif st.session_state.step == 2:
         help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco."
     )
     plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años, normalmente entre 20 y 30 años.")
+
+    capital_financiado = precio_vivienda - entrada_eur
+    tipo_interes_mensual = tipo_interes_hipoteca / 100 / 12
+    total_cuotas = plazo_hipoteca * 12
+    cuota_mensual_eur = capital_financiado * (tipo_interes_mensual * (1 + tipo_interes_mensual) ** total_cuotas) / ((1 + tipo_interes_mensual) ** total_cuotas - 1)
+
+    st.markdown(
+    f"""
+    <div style='display: inline-block; background: #e3f2fd; color: #1565c0;
+                border-radius: 12px; padding: 0.32em 1.2em; font-size: 1.07em;
+                font-weight: bold; margin-bottom: 0.5em; margin-top: -0.2em;'>
+        Hipoteca mensual: {cuota_mensual_eur:,.0f} €
+    </div>
+    """,
+    unsafe_allow_html=True)
     revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 4.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 4% y el 5% anual, pero puede variar según zona y mercado.")
     gasto_propietario_pct = st.number_input(
     "Gastos propietario anuales (% valor vivienda)",
