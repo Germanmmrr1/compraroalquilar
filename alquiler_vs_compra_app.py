@@ -149,6 +149,8 @@ def calcular_resultados(c, a):
         "capital_total_invertido": capital_invertido,
         "valor_final_inversion": inversion_inquilino,
         "patrimonio_neto_final_alq": inversion_inquilino,
+        "diferencia_patrimonio": inversion_inquilino - patrimonio_actual,
+        "diferencia_costes": gasto_alquiler_acum - gasto_acumulado,
         "anios": list(range(1, horizonte_anios + 1)),
         "patrimonio_compra": patrimonio_neto_lst[1:],
         "inversion_alquiler": inversion_acumulada_lst[1:],
@@ -630,6 +632,8 @@ elif st.session_state.step == 5:
     capital_total_invertido = resumen["capital_total_invertido"]
     valor_final_inversion = resumen["valor_final_inversion"]
     patrimonio_neto_final_alq = resumen["patrimonio_neto_final_alq"]
+    diferencia_patrimonio = resumen["diferencia_patrimonio"]
+    diferencia_costes = resumen["diferencia_costes"]
     anios = resumen["anios"]
     patrimonio_compra = resumen["patrimonio_compra"]
     inversion_alquiler = resumen["inversion_alquiler"]
@@ -687,24 +691,38 @@ elif st.session_state.step == 5:
         st.markdown("<div class='line'></div>", unsafe_allow_html=True)
         st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value green'>{patrimonio_neto_final_alq:,.0f} €</span></div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
-    
-        st.subheader("📈 Evolución del patrimonio")
-        fig, ax = plt.subplots()
-        ax.plot(anios, patrimonio_compra, label="Compra")
-        ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
-        ax.set_xlabel("Años")
-        ax.set_ylabel("Patrimonio (€)")
-        ax.legend()
-        st.pyplot(fig)
-    
-        st.subheader("💸 Coste acumulado")
-        fig2, ax2 = plt.subplots()
-        ax2.plot(anios, coste_compra_acumulado, label="Coste Compra")
-        ax2.plot(anios, coste_alquiler_acumulado, label="Coste Alquiler")
-        ax2.set_xlabel("Años")
-        ax2.set_ylabel("Coste acumulado (€)")
-        ax2.legend()
-        st.pyplot(fig2)
+
+    # Comparativa global de resultados
+    ventaja = "Alquiler + Inversión" if diferencia_patrimonio > 0 else "Compra"
+    st.markdown(
+        f"<div class='res-box' style='text-align:center;'>"
+        f"<div class='res-title'>🧮 Comparativa global</div>"
+        f"<span class='res-label'>Diferencia patrimonio final (alquiler - compra):</span>"
+        f"<span class='res-value'>{diferencia_patrimonio:,.0f} €</span><br>"
+        f"<span class='res-label'>Diferencia costes acumulados (alquiler - compra):</span>"
+        f"<span class='res-value'>{diferencia_costes:,.0f} €</span><br>"
+        f"<span class='res-label'>Ventaja:</span> <span class='res-value'>{ventaja}</span>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    st.subheader("📈 Evolución del patrimonio")
+    fig, ax = plt.subplots()
+    ax.plot(anios, patrimonio_compra, label="Compra")
+    ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
+    ax.set_xlabel("Años")
+    ax.set_ylabel("Patrimonio (€)")
+    ax.legend()
+    st.pyplot(fig)
+
+    st.subheader("💸 Coste acumulado")
+    fig2, ax2 = plt.subplots()
+    ax2.plot(anios, coste_compra_acumulado, label="Coste Compra")
+    ax2.plot(anios, coste_alquiler_acumulado, label="Coste Alquiler")
+    ax2.set_xlabel("Años")
+    ax2.set_ylabel("Coste acumulado (€)")
+    ax2.legend()
+    st.pyplot(fig2)
     
 
     if "email_confirmed" not in st.session_state:
