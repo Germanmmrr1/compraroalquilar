@@ -238,8 +238,8 @@ elif st.session_state.step == 3:
     0.0, 20.0, 10.0,help="Rentabilidad media anual estimada al invertir el dinero ahorrado en fondos o activos globales.\n"
          "Ejemplos históricos:\n"
          "• MSCI World: ~8% anual\n"
-         "• S&P 500: ~10% anual\n"
-         "• Oro: ~6% anual\n"
+         "• S&P 500: ~11% anual\n"
+         "• Oro: ~9% anual\n"
          "Puedes ajustar este valor según tu perfil y horizonte de inversión.")
     horizonte_anios = st.slider(
         "Horizonte de análisis (años)", 1, 40, 25, help="Número de años para comparar compra y alquiler.",)
