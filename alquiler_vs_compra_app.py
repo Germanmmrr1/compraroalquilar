@@ -513,7 +513,7 @@ elif st.session_state.step == 5:
 
         inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
         alquiler_anual = (alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12)
-        aportacion = max(cuota_hipoteca_anual - alquiler_anual, 0)
+        aportacion = max(cuota_hipoteca_anual + (precio_vivienda * gasto_propietario_pct / 100) + seguro_hogar_eur + seguro_vida_eur - alquiler_anual, 0)
 
         inversion_inquilino += aportacion
         capital_invertido += aportacion
