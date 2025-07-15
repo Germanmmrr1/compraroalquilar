@@ -489,6 +489,7 @@ elif st.session_state.step == 5:
     tipo_mensual = tipo_interes_hipoteca / 100 / 12
     n_meses = plazo_hipoteca * 12
     cuota_mensual = npf.pmt(tipo_mensual, n_meses, -capital_financiado)
+    cuota_hipoteca_anual = cuota_mensual * 12
 
     anios = list(range(1, horizonte_anios + 1))
     valor_vivienda = []
@@ -511,13 +512,9 @@ elif st.session_state.step == 5:
         patrimonio_compra.append(patrimonio_actual)
 
         inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
-        aportacion = (
-            precio_vivienda * gasto_propietario_pct / 100
-            + precio_vivienda * seguro_hogar_pct / 100
-            + deuda_actual * seguro_vida_pct / 100
-            + seguro_hogar_eur
-            + seguro_vida_eur
-        )
+        alquiler_anual = (alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12)
+        aportacion = max(cuota_hipoteca_anual - alquiler_anual, 0)
+
         inversion_inquilino += aportacion
         capital_invertido += aportacion
         inversion_alquiler.append(inversion_inquilino)
