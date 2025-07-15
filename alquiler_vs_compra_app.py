@@ -611,14 +611,64 @@ elif st.session_state.step == 5:
         ax2.legend()
         st.pyplot(fig2)
     
+        # ----- NUEVAS LISTAS PARA LA TABLA DETALLADA -----
+        years                    = [0]            # empezamos en el año 0
+        precio_vivienda_lst      = [precio_vivienda]
+        gastos_iniciales_lst     = [entrada + gastos_compra]
+        hipoteca_amortizada_lst  = [0]            # al inicio no has amortizado nada
+        deuda_pendiente_lst      = [capital_financiado]
+        gastos_anuales_lst       = [0]
+        gastos_acumulados_lst    = [entrada + gastos_compra]
+        patrimonio_neto_lst      = [-(entrada + gastos_compra)]
+        gasto_alquiler_anual_lst = [0]
+        gasto_alq_acum_lst       = [0]
+        disponible_inv_lst       = [entrada + gastos_compra]   # arranque
+        total_invertido_lst      = [entrada + gastos_compra]
+        inversion_acumulada_lst  = [entrada + gastos_compra]
+        patrimonio_alq_lst       = [entrada + gastos_compra]
+
+# ----- BUCLE PRINCIPAL -----
+        for year in anios:
+            # ... (todo tu cálculo existente) ...
+        
+            # amortizado este año
+            hipoteca_amortizada = capital_financiado - deuda_actual
+            gastos_propietario  = precio_vivienda * gasto_propietario_pct / 100 + seguro_hogar_eur + seguro_vida_eur
+            gasto_acu           = gastos_acumulados_lst[-1] + gastos_propietario
+            gast_alq_acu        = gasto_alq_acum_lst[-1] + alquiler_anual
+        
+            # guardamos para la tabla
+            years.append(year)
+            precio_vivienda_lst.append(valor_actual_vivienda)
+            gastos_iniciales_lst.append(entrada + gastos_compra if year == 1 else 0)
+            hipoteca_amortizada_lst.append(hipoteca_amortizada)
+            deuda_pendiente_lst.append(deuda_actual)
+            gastos_anuales_lst.append(gastos_propietario)
+            gastos_acumulados_lst.append(gasto_acu)
+            patrimonio_neto_lst.append(patrimonio_actual)
+            gasto_alquiler_anual_lst.append(alquiler_anual)
+            gasto_alq_acum_lst.append(gast_alq_acu)
+            disponible_inv_lst.append(aportacion)
+            total_invertido_lst.append(capital_invertido)
+            inversion_acumulada_lst.append(inversion_inquilino)
+            patrimonio_alq_lst.append(inversion_inquilino)
+
+# ----- DATAFRAME DETALLADO -----
         df_resultados = pd.DataFrame({
-            "Año": anios,
-            "Valor Vivienda (€)": valor_vivienda,
-            "Deuda Pendiente (€)": deuda_pendiente,
-            "Patrimonio Compra (€)": patrimonio_compra,
-            "Inversión Alquiler (€)": inversion_alquiler,
-            "Coste Compra (€)": coste_compra_acumulado,
-            "Coste Alquiler (€)": coste_alquiler_acumulado,
+            "Año":                      years,
+            "Precio Vivienda (€)":      precio_vivienda_lst,
+            "Gastos iniciales (€)":     gastos_iniciales_lst,
+            "Hipoteca amortizada (€)":  hipoteca_amortizada_lst,
+            "Deuda Pendiente (€)":      deuda_pendiente_lst,
+            "Gastos anuales (€)":       gastos_anuales_lst,
+            "Gastos acumulados (€)":    gastos_acumulados_lst,
+            "Patrimonio neto compra (€)": patrimonio_neto_lst,
+            "Gasto alquiler anual (€)": gasto_alquiler_anual_lst,
+            "Gasto alquiler acumulado (€)": gasto_alq_acum_lst,
+            "Disponible inversión (€)": disponible_inv_lst,
+            "Total invertido (€)":      total_invertido_lst,
+            "Inversión acumulada (€)":  inversion_acumulada_lst,
+            "Patrimonio neto alquiler (€)": patrimonio_alq_lst,
         })
     
         if "email_confirmed" not in st.session_state:
