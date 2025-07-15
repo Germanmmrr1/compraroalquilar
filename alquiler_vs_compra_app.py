@@ -539,10 +539,10 @@ elif st.session_state.step == 5:
     patrimonio_neto_final = patrimonio_compra[-1]
 
     inversion_inicial_alq = entrada + gastos_compra
-    costes_alquiler = coste_alquiler_acumulado[-1]
-    capital_total_invertido = capital_invertido
+    costes_alquiler_total = coste_alquiler_acumulado[-1]
+    capital_total_invertido = costes_compra - costes_alquiler_total
     valor_final_inversion = inversion_inquilino
-    patrimonio_neto_final_alq = valor_final_inversion
+    patrimonio_neto_final_alq = valor_final_inversion - costes_alquiler_total
 
     # --- Visualización tipo "caja resumen" ---
     st.markdown("""
@@ -589,7 +589,7 @@ elif st.session_state.step == 5:
         st.markdown("<div class='res-box green'>", unsafe_allow_html=True)
         st.markdown("<div class='res-title green'>🔑 Opción Alquiler + Inversión</div>", unsafe_allow_html=True)
         st.markdown(f"<span class='res-label'>Inversión inicial:</span><span class='res-value green'>{inversion_inicial_alq:,.0f} €</span>", unsafe_allow_html=True)
-        st.markdown(f"<span class='res-label'>Costes alquiler acumulados:</span><span class='res-value green'>{costes_alquiler:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Costes alquiler acumulados:</span><span class='res-value green'>{costes_alquiler_total:,.0f} €</span>", unsafe_allow_html=True)
         st.markdown(f"<span class='res-label'>Capital total invertido (acumulado):</span><span class='res-value green'>{capital_total_invertido:,.0f} €</span>", unsafe_allow_html=True)
         st.markdown(f"<span class='res-label'>Valor final inversión:</span><span class='res-value green'>{valor_final_inversion:,.0f} €</span>", unsafe_allow_html=True)
         st.markdown("<div class='line'></div>", unsafe_allow_html=True)
