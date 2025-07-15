@@ -620,7 +620,7 @@ elif st.session_state.step == 5:
     precio_vivienda_lst      = [precio_vivienda]
     gastos_iniciales_lst     = [entrada + gastos_compra]
     hipoteca_amortizada_lst  = [0]
-    deuda_pendiente_lst      = [capital_financiado]
+    deuda_pendiente_lst      = [cuota_hipoteca_anual * 25]
     gastos_anuales_lst       = [0]
     gastos_acumulados_lst    = [entrada + gastos_compra]
     patrimonio_neto_lst      = [-(entrada + gastos_compra)]
@@ -649,7 +649,7 @@ elif st.session_state.step == 5:
         # Gastos anuales propietario (IBI, comunidad, seguros)
         gastos_propietario = precio_vivienda * gasto_propietario_pct / 100 + seguro_hogar_eur + seguro_vida_eur
         # Gastos acumulados compra
-        gasto_acumulado += gastos_propietario
+        gasto_acumulado += gastos_propietario + min(cuota_hipoteca_anual * year, capital_financiado)
         # Gasto alquiler anual ese año
         alquiler_anual = alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12
         # Gasto alquiler acumulado
