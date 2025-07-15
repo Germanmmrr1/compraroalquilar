@@ -4,6 +4,169 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+
+def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
+                          horizonte: int):
+    """Devuelve principal e importes totales pagados y pendientes por año."""
+    cuota = npf.pmt(tasa_mensual, meses, -capital)
+    saldo = capital
+    amort_principal = 0.0
+    pagado_total = 0.0
+
+    amort_principal_anual = [0.0]
+    deuda_principal_anual = [capital]
+    pagado_anual = [0.0]
+    deuda_total_anual = [cuota * meses]
+
+    limite_meses = min(meses, horizonte * 12)
+    for mes in range(1, limite_meses + 1):
+        interes = saldo * tasa_mensual
+        principal = cuota - interes
+        saldo -= principal
+        amort_principal += principal
+        pagado_total += cuota
+        if mes % 12 == 0:
+            amort_principal_anual.append(amort_principal)
+            deuda_principal_anual.append(max(saldo, 0.0))
+            pagado_anual.append(pagado_total)
+            deuda_total_anual.append(max(cuota * (meses - mes), 0.0))
+
+    while len(amort_principal_anual) < horizonte + 1:
+        amort_principal_anual.append(amort_principal)
+        deuda_principal_anual.append(max(saldo, 0.0))
+        pagado_anual.append(pagado_total)
+        deuda_total_anual.append(max(cuota * (meses - limite_meses), 0.0))
+
+    return (amort_principal_anual, deuda_principal_anual,
+            pagado_anual, deuda_total_anual)
+
+
+def calcular_resultados(c, a):
+    """Realiza todos los cálculos y devuelve un DataFrame y métricas."""
+    precio_vivienda = c['precio_vivienda']
+    entrada_pct = c['entrada_pct']
+    gastos_compra_pct = c['gastos_compra_pct']
+    tipo_interes_hipoteca = c['tipo_interes_hipoteca']
+    plazo_hipoteca = c['plazo_hipoteca']
+    revalorizacion_vivienda_pct = c['revalorizacion_vivienda_pct']
+    gasto_propietario_pct = c.get('gasto_propietario_pct', 0.0)
+    seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
+    seguro_vida_eur = c.get('seguro_vida_eur', 0.0)
+
+    alquiler_inicial = a['alquiler_inicial']
+    subida_alquiler_anual_pct = a['subida_alquiler_anual_pct']
+    rentabilidad_inversion_pct = a['rentabilidad_inversion_pct']
+    horizonte_anios = a.get('horizonte_anios', plazo_hipoteca)
+
+    entrada = precio_vivienda * entrada_pct / 100
+    gastos_compra = precio_vivienda * gastos_compra_pct / 100
+    capital_financiado = precio_vivienda - entrada
+
+    tasa_mensual = tipo_interes_hipoteca / 100 / 12
+    meses_totales = plazo_hipoteca * 12
+    cuota_mensual = npf.pmt(tasa_mensual, meses_totales, -capital_financiado)
+    cuota_anual = cuota_mensual * 12
+
+    amort_principal, deuda_principal, pagos_acum, deuda_total = amortizacion_hipoteca(
+        capital_financiado, tasa_mensual, meses_totales, horizonte_anios
+    )
+
+    years = [0]
+    precio_vivienda_lst = [precio_vivienda]
+    gastos_iniciales_lst = [entrada + gastos_compra]
+    hipoteca_amortizada_lst = [0.0]
+    deuda_pendiente_lst = [cuota_mensual * meses_totales]
+    deuda_principal_lst = [capital_financiado]
+    gastos_anuales_lst = [0.0]
+    gastos_acumulados_lst = [entrada + gastos_compra]
+    patrimonio_neto_lst = [-(entrada + gastos_compra)]
+    gasto_alquiler_anual_lst = [0.0]
+    gasto_alq_acum_lst = [0.0]
+    disponible_inv_lst = [entrada + gastos_compra]
+    total_invertido_lst = [entrada + gastos_compra]
+    inversion_acumulada_lst = [entrada + gastos_compra]
+    patrimonio_alq_lst = [entrada + gastos_compra]
+
+    inversion_inquilino = entrada + gastos_compra
+    capital_invertido = entrada + gastos_compra
+    gasto_acumulado = entrada + gastos_compra
+    gasto_alquiler_acum = 0.0
+
+    for year in range(1, horizonte_anios + 1):
+        valor_actual_vivienda = precio_vivienda * (1 + revalorizacion_vivienda_pct / 100) ** year
+        hipoteca_amortizada = pagos_acum[year]
+        deuda_total_actual = deuda_total[year]
+        deuda_principal_actual = deuda_principal[year]
+        patrimonio_actual = valor_actual_vivienda - deuda_principal_actual
+
+        gastos_propietario = precio_vivienda * gasto_propietario_pct / 100 + seguro_hogar_eur + seguro_vida_eur
+        cuota_ano = cuota_anual if year <= plazo_hipoteca else 0.0
+        gasto_acumulado += gastos_propietario + cuota_ano
+
+        alquiler_anual = alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12
+        gasto_alquiler_acum += alquiler_anual
+
+        aportacion = max(cuota_ano + gastos_propietario - alquiler_anual, 0.0)
+
+        inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
+        inversion_inquilino += aportacion
+        capital_invertido += aportacion
+
+        gastos_iniciales = entrada + gastos_compra if year == 1 else 0.0
+
+        years.append(year)
+        precio_vivienda_lst.append(valor_actual_vivienda)
+        gastos_iniciales_lst.append(gastos_iniciales)
+        hipoteca_amortizada_lst.append(hipoteca_amortizada)
+        deuda_pendiente_lst.append(deuda_total_actual)
+        deuda_principal_lst.append(deuda_principal_actual)
+        gastos_anuales_lst.append(gastos_propietario)
+        gastos_acumulados_lst.append(gasto_acumulado)
+        patrimonio_neto_lst.append(patrimonio_actual)
+        gasto_alquiler_anual_lst.append(alquiler_anual)
+        gasto_alq_acum_lst.append(gasto_alquiler_acum)
+        disponible_inv_lst.append(aportacion)
+        total_invertido_lst.append(capital_invertido)
+        inversion_acumulada_lst.append(inversion_inquilino)
+        patrimonio_alq_lst.append(inversion_inquilino)
+
+    df = pd.DataFrame({
+        "Año": years,
+        "Precio Vivienda (€)": precio_vivienda_lst,
+        "Gastos iniciales (€)": gastos_iniciales_lst,
+        "Hipoteca amortizada (€)": hipoteca_amortizada_lst,
+        "Deuda Pendiente (€)": deuda_pendiente_lst,
+        "Gastos anuales (€)": gastos_anuales_lst,
+        "Gastos acumulados (€)": gastos_acumulados_lst,
+        "Patrimonio neto compra (€)": patrimonio_neto_lst,
+        "Gasto alquiler anual (€)": gasto_alquiler_anual_lst,
+        "Gasto alquiler acumulado (€)": gasto_alq_acum_lst,
+        "Disponible inversión (€)": disponible_inv_lst,
+        "Total invertido (€)": total_invertido_lst,
+        "Inversión acumulada (€)": inversion_acumulada_lst,
+        "Patrimonio neto alquiler (€)": patrimonio_alq_lst,
+    })
+
+    resumen = {
+        "desembolso_inicial_compra": entrada + gastos_compra,
+        "costes_compra": gasto_acumulado,
+        "valor_prop_final": valor_actual_vivienda,
+        "hipoteca_pendiente": deuda_principal_actual,
+        "patrimonio_neto_final": patrimonio_actual,
+        "inversion_inicial_alq": entrada + gastos_compra,
+        "costes_alquiler_total": gasto_alquiler_acum,
+        "capital_total_invertido": capital_invertido,
+        "valor_final_inversion": inversion_inquilino,
+        "patrimonio_neto_final_alq": inversion_inquilino,
+        "anios": list(range(1, horizonte_anios + 1)),
+        "patrimonio_compra": patrimonio_neto_lst[1:],
+        "inversion_alquiler": inversion_acumulada_lst[1:],
+        "coste_compra_acumulado": gastos_acumulados_lst[1:],
+        "coste_alquiler_acumulado": gasto_alq_acum_lst[1:],
+    }
+
+    return resumen, df
+
 st.markdown("""
     <style>
     .center-title {
@@ -462,84 +625,25 @@ elif st.session_state.step == 5:
     st.session_state.compra = c
     st.session_state.alquiler = a
 
-    # Variables actualizadas
-    precio_vivienda = c['precio_vivienda']
-    entrada_pct = c['entrada_pct']
-    gastos_compra_pct = c['gastos_compra_pct']
-    tipo_interes_hipoteca = c['tipo_interes_hipoteca']
-    plazo_hipoteca = c['plazo_hipoteca']
-    revalorizacion_vivienda_pct = c['revalorizacion_vivienda_pct']
+    resumen, df_resultados = calcular_resultados(c, a)
 
-    alquiler_inicial = a['alquiler_inicial']
-    subida_alquiler_anual_pct = a['subida_alquiler_anual_pct']
-    rentabilidad_inversion_pct = a['rentabilidad_inversion_pct']
+    horizonte_anios = len(resumen["anios"])
 
-    horizonte_anios = a.get('horizonte_anios', c.get('plazo_hipoteca', 25))
-    gasto_propietario_pct = c.get('gasto_propietario_pct', 0.0)
-    seguro_hogar_pct = 0.0
-    seguro_hogar_eur = c.get('seguro_hogar_eur', 0.0)
-    seguro_vida_pct = 0.0
-    seguro_vida_eur = c.get('seguro_vida_eur', 0.0)
-
- # --- Cálculos ---
-    entrada = precio_vivienda * entrada_pct / 100
-    gastos_compra = precio_vivienda * gastos_compra_pct / 100
-    capital_financiado = precio_vivienda * (100 - entrada_pct) / 100
-
-    tipo_mensual = tipo_interes_hipoteca / 100 / 12
-    n_meses = plazo_hipoteca * 12
-    cuota_mensual = npf.pmt(tipo_mensual, n_meses, -capital_financiado)
-    cuota_hipoteca_anual = cuota_mensual * 12
-
-    anios = list(range(1, horizonte_anios + 1))
-    valor_vivienda = []
-    deuda_pendiente = []
-    patrimonio_compra = []
-    inversion_alquiler = []
-    coste_compra_acumulado = []
-    coste_alquiler_acumulado = []
-
-    inversion_inquilino = entrada + gastos_compra
-    capital_invertido = entrada + gastos_compra
-
-    for year in anios:
-        valor_actual_vivienda = precio_vivienda * (1 + revalorizacion_vivienda_pct / 100) ** year
-        valor_vivienda.append(valor_actual_vivienda)
-        amortizacion = min(1.0, year / plazo_hipoteca)
-        deuda_actual = capital_financiado * (1 - amortizacion)
-        deuda_pendiente.append(deuda_actual)
-        patrimonio_actual = valor_actual_vivienda - deuda_actual
-        patrimonio_compra.append(patrimonio_actual)
-
-        inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
-        alquiler_anual = (alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12)
-        aportacion = max(cuota_hipoteca_anual + (precio_vivienda * gasto_propietario_pct / 100) + seguro_hogar_eur + seguro_vida_eur - alquiler_anual, 0)
-
-        inversion_inquilino += aportacion
-        capital_invertido += aportacion
-        inversion_alquiler.append(inversion_inquilino)
-
-        coste_c = entrada + gastos_compra + cuota_mensual * 12 * min(year, plazo_hipoteca)
-        coste_c += precio_vivienda * gasto_propietario_pct / 100 * year
-        coste_c += (precio_vivienda * seguro_hogar_pct / 100 + seguro_hogar_eur) * year
-        coste_c += (capital_financiado * seguro_vida_pct / 100 + seguro_vida_eur) * min(year, plazo_hipoteca)
-        coste_compra_acumulado.append(coste_c)
-
-        coste_a = sum(alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** y * 12 for y in range(year))
-        coste_alquiler_acumulado.append(coste_a)
-
-    # --- Calcular valores finales para mostrar en cajas resumen ---
-    desembolso_inicial_compra = entrada + gastos_compra
-    costes_compra = coste_compra_acumulado[-1]
-    valor_prop_final = valor_vivienda[-1]
-    hipoteca_pendiente = deuda_pendiente[-1]
-    patrimonio_neto_final = patrimonio_compra[-1]
-
-    inversion_inicial_alq = entrada + gastos_compra
-    costes_alquiler_total = coste_alquiler_acumulado[-1]
-    capital_total_invertido = costes_compra - costes_alquiler_total
-    valor_final_inversion = inversion_inquilino
-    patrimonio_neto_final_alq = valor_final_inversion
+    desembolso_inicial_compra = resumen["desembolso_inicial_compra"]
+    costes_compra = resumen["costes_compra"]
+    valor_prop_final = resumen["valor_prop_final"]
+    hipoteca_pendiente = resumen["hipoteca_pendiente"]
+    patrimonio_neto_final = resumen["patrimonio_neto_final"]
+    inversion_inicial_alq = resumen["inversion_inicial_alq"]
+    costes_alquiler_total = resumen["costes_alquiler_total"]
+    capital_total_invertido = resumen["capital_total_invertido"]
+    valor_final_inversion = resumen["valor_final_inversion"]
+    patrimonio_neto_final_alq = resumen["patrimonio_neto_final_alq"]
+    anios = resumen["anios"]
+    patrimonio_compra = resumen["patrimonio_compra"]
+    inversion_alquiler = resumen["inversion_alquiler"]
+    coste_compra_acumulado = resumen["coste_compra_acumulado"]
+    coste_alquiler_acumulado = resumen["coste_alquiler_acumulado"]
 
     # --- Visualización tipo "caja resumen" ---
     st.markdown("""
@@ -611,94 +715,7 @@ elif st.session_state.step == 5:
         ax2.legend()
         st.pyplot(fig2)
     
-      # ---- CÁLCULO COMPLETO PARA DATAFRAME DETALLADO ----
 
-    anios = list(range(1, horizonte_anios + 1))
-
-# Inicialización de listas y año 0
-    years                    = [0]
-    precio_vivienda_lst      = [precio_vivienda]
-    gastos_iniciales_lst     = [entrada + gastos_compra]
-    hipoteca_amortizada_lst  = [0]
-    deuda_pendiente_lst      = [cuota_hipoteca_anual * 25]
-    gastos_anuales_lst       = [0]
-    gastos_acumulados_lst    = [entrada + gastos_compra]
-    patrimonio_neto_lst      = [-(entrada + gastos_compra)]
-    gasto_alquiler_anual_lst = [0]
-    gasto_alq_acum_lst       = [0]
-    disponible_inv_lst       = [entrada + gastos_compra]
-    total_invertido_lst      = [entrada + gastos_compra]
-    inversion_acumulada_lst  = [entrada + gastos_compra]
-    patrimonio_alq_lst       = [entrada + gastos_compra]
-    
-    # Estado inicial para el cálculo del año 1 en adelante
-    inversion_inquilino = entrada + gastos_compra
-    capital_invertido   = entrada + gastos_compra
-    gasto_acumulado     = entrada + gastos_compra
-    gasto_alquiler_acum = 0
-
-    for year in anios:
-        # Precio vivienda actualizado
-        valor_actual_vivienda = precio_vivienda * (1 + revalorizacion_vivienda_pct / 100) ** year
-        # Amortización anual (acumulada, sin pasarse del capital financiado)
-        hipoteca_amortizada = min(cuota_hipoteca_anual * year, capital_financiado)
-        # Deuda pendiente decreciente
-        deuda_actual = max(capital_financiado - hipoteca_amortizada, 0)
-        # Patrimonio neto por compra
-        patrimonio_actual = valor_actual_vivienda - deuda_actual
-        # Gastos anuales propietario (IBI, comunidad, seguros)
-        gastos_propietario = precio_vivienda * gasto_propietario_pct / 100 + seguro_hogar_eur + seguro_vida_eur
-        # Gastos acumulados compra
-        gasto_acumulado += gastos_propietario + min(cuota_hipoteca_anual * year, capital_financiado)
-        # Gasto alquiler anual ese año
-        alquiler_anual = alquiler_inicial * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12
-        # Gasto alquiler acumulado
-        gasto_alquiler_acum += alquiler_anual
-        # Disponible para invertir (aportación anual)
-        aportacion = max(cuota_hipoteca_anual + (precio_vivienda * gasto_propietario_pct / 100) + seguro_hogar_eur + seguro_vida_eur - alquiler_anual, 0)
-        # Rentabilidad de la inversión + aportación de este año
-        inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
-        inversion_inquilino += aportacion
-        capital_invertido += aportacion
-    
-        # Solo año 1 con gastos iniciales, luego 0
-        gastos_iniciales = entrada + gastos_compra if year == 1 else 0
-
-    # Guardar resultados
-        years.append(year)
-        precio_vivienda_lst.append(valor_actual_vivienda)
-        gastos_iniciales_lst.append(gastos_iniciales)
-        hipoteca_amortizada_lst.append(hipoteca_amortizada)
-        deuda_pendiente_lst.append(deuda_actual)
-        gastos_anuales_lst.append(gastos_propietario)
-        gastos_acumulados_lst.append(gasto_acumulado)
-        patrimonio_neto_lst.append(patrimonio_actual)
-        gasto_alquiler_anual_lst.append(alquiler_anual)
-        gasto_alq_acum_lst.append(gasto_alquiler_acum)
-        disponible_inv_lst.append(aportacion)
-        total_invertido_lst.append(capital_invertido)
-        inversion_acumulada_lst.append(inversion_inquilino)
-        patrimonio_alq_lst.append(inversion_inquilino)
-
-# DataFrame para exportar/mostrar (cabecera editable a tu gusto)
-    df_resultados = pd.DataFrame({
-        "Año": years,
-        "Precio Vivienda (€)": precio_vivienda_lst,
-        "Gastos iniciales (€)": gastos_iniciales_lst,
-        "Hipoteca amortizada (€)": hipoteca_amortizada_lst,
-        "Deuda Pendiente (€)": deuda_pendiente_lst,
-        "Gastos anuales (€)": gastos_anuales_lst,
-        "Gastos acumulados (€)": gastos_acumulados_lst,
-        "Patrimonio neto compra (€)": patrimonio_neto_lst,
-        "Gasto alquiler anual (€)": gasto_alquiler_anual_lst,
-        "Gasto alquiler acumulado (€)": gasto_alq_acum_lst,
-        "Disponible inversión (€)": disponible_inv_lst,
-        "Total invertido (€)": total_invertido_lst,
-        "Inversión acumulada (€)": inversion_acumulada_lst,
-        "Patrimonio neto alquiler (€)": patrimonio_alq_lst,
-    })
-
-    
     if "email_confirmed" not in st.session_state:
         st.session_state.email_confirmed = False
 
