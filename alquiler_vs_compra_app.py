@@ -105,8 +105,6 @@ def calcular_resultados(c, a):
         inversion_inquilino += aportacion
         capital_invertido += aportacion
 
-        gastos_iniciales = entrada + gastos_compra if year == 1 else 0.0
-
         years.append(year)
         precio_vivienda_lst.append(valor_actual_vivienda)
         gastos_iniciales_lst.append(gastos_iniciales)
