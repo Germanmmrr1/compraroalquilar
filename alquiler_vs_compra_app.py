@@ -542,7 +542,7 @@ elif st.session_state.step == 5:
     costes_alquiler_total = coste_alquiler_acumulado[-1]
     capital_total_invertido = costes_compra - costes_alquiler_total
     valor_final_inversion = inversion_inquilino
-    patrimonio_neto_final_alq = valor_final_inversion - costes_alquiler_total
+    patrimonio_neto_final_alq = valor_final_inversion
 
     # --- Visualización tipo "caja resumen" ---
     st.markdown("""
