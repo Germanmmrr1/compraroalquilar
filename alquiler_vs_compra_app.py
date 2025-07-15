@@ -7,25 +7,31 @@ import os
 
 def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
                           horizonte: int):
-    """Devuelve la amortización acumulada y la deuda pendiente por año."""
+    """Devuelve la amortización y la deuda pendiente por año considerando
+    capital e intereses."""
+
     cuota = npf.pmt(tasa_mensual, meses, -capital)
-    saldo = capital
-    amortizado = 0.0
+
+    saldo_capital = capital
+    pagos_realizados = 0.0
+    deuda_total = cuota * meses
+
     amort_anual = [0.0]
-    deuda_anual = [capital]
+    deuda_anual = [deuda_total]
 
     for mes in range(1, min(meses, horizonte * 12) + 1):
-        interes = saldo * tasa_mensual
+        interes = saldo_capital * tasa_mensual
         principal = cuota - interes
-        saldo -= principal
-        amortizado += principal
+        saldo_capital -= principal
+        pagos_realizados += cuota
+        deuda_total -= cuota
         if mes % 12 == 0:
-            amort_anual.append(amortizado)
-            deuda_anual.append(max(saldo, 0.0))
+            amort_anual.append(pagos_realizados)
+            deuda_anual.append(max(deuda_total, 0.0))
 
     while len(amort_anual) < horizonte + 1:
-        amort_anual.append(amortizado)
-        deuda_anual.append(max(saldo, 0.0))
+        amort_anual.append(pagos_realizados)
+        deuda_anual.append(max(deuda_total, 0.0))
 
     return amort_anual, deuda_anual
 
