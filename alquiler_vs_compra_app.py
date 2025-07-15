@@ -66,6 +66,7 @@ def calcular_resultados(c, a):
         capital_financiado, tasa_mensual, meses_totales, horizonte_anios
     )
 
+    gastos_iniciales = 0
     years = [0]
     precio_vivienda_lst = [precio_vivienda]
     gastos_iniciales_lst = [entrada + gastos_compra]
