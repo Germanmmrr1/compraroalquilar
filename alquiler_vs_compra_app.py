@@ -641,9 +641,9 @@ elif st.session_state.step == 5:
         # Precio vivienda actualizado
         valor_actual_vivienda = precio_vivienda * (1 + revalorizacion_vivienda_pct / 100) ** year
         # Amortización anual (acumulada, sin pasarse del capital financiado)
-        hipoteca_amortizada = min(cuota_hipoteca_anual * year, deuda_pendiente_lst)
+        hipoteca_amortizada = min(cuota_hipoteca_anual * year, capital_financiado)
         # Deuda pendiente decreciente
-        deuda_actual = max(deuda_pendiente_lst - hipoteca_amortizada, 0)
+        deuda_actual = max(capital_financiado - hipoteca_amortizada, 0)
         # Patrimonio neto por compra
         patrimonio_actual = valor_actual_vivienda - deuda_actual
         # Gastos anuales propietario (IBI, comunidad, seguros)
