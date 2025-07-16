@@ -719,14 +719,13 @@ elif st.session_state.step == 5:
         min-width: 320px;
         box-shadow: 0 4px 18px rgba(60,120,220,0.05);
     }
-    .res-title {
-        font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
-    }
+    .res-title {font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;}
     .res-label { font-weight: 600; color: #FFFFFF;}
     .res-label2 { font-weight: 600; color: #222;}
     .res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
     .res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
     .res-title.green { color: #13a656;}
+    .res-title.black { color: #222;}
     .res-value.green { color: #13a656;}
     .red { color: #e03a3a; font-weight: bold;}
     .line { border-bottom: 1.1px solid #b0b8c2; margin: 0.6em 0;}
@@ -764,7 +763,7 @@ elif st.session_state.step == 5:
     ventaja = "Alquiler + Inversión" if diferencia_patrimonio > 0 else "Compra"
     st.markdown(
         f"<div class='res-box' style='text-align:center;'>"
-        f"<div class='res-title'>🧮 Comparativa global</div>"
+        f"<div class='res-title black'>🧮 Comparativa global</div>"
         f"<span class='res-label2'>Diferencia patrimonio final (alquiler - compra):</span>"
         f"<span class='res-value'>{diferencia_patrimonio:,.0f} €</span><br>"
         f"<span class='res-label2'>Diferencia costes acumulados (alquiler - compra):</span>"
