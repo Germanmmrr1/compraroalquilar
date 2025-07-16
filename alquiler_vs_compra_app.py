@@ -4,9 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import matplotlib.ticker as mticker
-from fpdf import FPDF
-import io
-
 
 
 
