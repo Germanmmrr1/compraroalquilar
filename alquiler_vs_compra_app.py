@@ -3,6 +3,11 @@ import numpy_financial as npf
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import matplotlib.ticker as mticker
+from fpdf import FPDF
+import io
+
+
 
 
 def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
@@ -706,16 +711,17 @@ elif st.session_state.step == 5:
         unsafe_allow_html=True,
     )
 
-    st.subheader("📈 Evolución del patrimonio")
+    st.markdown("<h3 style='text-align: center;'>📈 Evolución del patrimonio</h3>",unsafe_allow_html=True)
     fig, ax = plt.subplots()
     ax.plot(anios, patrimonio_compra, label="Compra")
     ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
     ax.set_xlabel("Años")
     ax.set_ylabel("Patrimonio (€)")
     ax.legend()
+    ax.yaxis.set_major_formatter(mticker.StrMethodFormatter('{x:,.0f}'))
     st.pyplot(fig)
 
-    st.subheader("💸 Coste acumulado")
+    st.markdown("<h3 style='text-align: center;'>💸 Coste acumulado</h3>",unsafe_allow_html=True)
     fig2, ax2 = plt.subplots()
     ax2.plot(anios, coste_compra_acumulado, label="Coste Compra")
     ax2.plot(anios, coste_alquiler_acumulado, label="Coste Alquiler")
@@ -747,6 +753,7 @@ elif st.session_state.step == 5:
             else:
                 st.warning("Por favor ingresa un email válido.")
 
+    
     if st.session_state.email_confirmed:
         st.download_button(
             "📥 Descargar resultados como CSV",
