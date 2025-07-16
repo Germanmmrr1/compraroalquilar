@@ -249,7 +249,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("¿Comprar o alquilar casa?")
+st.markdown("""<h1 style='text-align: center;'>¿Comprar o alquilar casa?</h1>""", unsafe_allow_html=True)
 
 # Estado inicial de pasos
 if "step" not in st.session_state:
