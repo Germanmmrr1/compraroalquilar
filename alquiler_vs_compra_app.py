@@ -723,6 +723,7 @@ elif st.session_state.step == 5:
         font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
     }
     .res-label { font-weight: 600; color: #FFFFFF;}
+    .res-label2 { font-weight: 600; color: #222;}
     .res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
     .res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
     .res-title.green { color: #13a656;}
@@ -764,11 +765,11 @@ elif st.session_state.step == 5:
     st.markdown(
         f"<div class='res-box' style='text-align:center;'>"
         f"<div class='res-title'>🧮 Comparativa global</div>"
-        f"<span class='res-label'>Diferencia patrimonio final (alquiler - compra):</span>"
+        f"<span class='res-label2'>Diferencia patrimonio final (alquiler - compra):</span>"
         f"<span class='res-value'>{diferencia_patrimonio:,.0f} €</span><br>"
-        f"<span class='res-label'>Diferencia costes acumulados (alquiler - compra):</span>"
+        f"<span class='res-label2'>Diferencia costes acumulados (alquiler - compra):</span>"
         f"<span class='res-value'>{diferencia_costes:,.0f} €</span><br>"
-        f"<span class='res-label'>Ventaja:</span> <span class='res-value'>{ventaja}</span>"
+        f"<span class='res-label2'>Ventaja:</span> <span class='res-value'>{ventaja}</span>"
         f"</div>",
         unsafe_allow_html=True,
     )
