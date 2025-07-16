@@ -192,6 +192,13 @@ def generar_pdf(resumen, df):
         "diferencia_patrimonio": "Diferencia patrimonio final",
         "diferencia_costes": "Diferencia costes acumulados",
     }
+    pdf.set_font("Helvetica", size=11)
+    for k, label in etiquetas.items():
+        val = resumen.get(k, "")
+        if isinstance(val, float):
+            val = f"{val:,.0f} EUR"   # <-- This removes decimals and adds thousands separator
+        pdf.cell(0, 8, f"{label}: {val}", ln=True)
+  
     pdf.ln(5)
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 10, "Resultados por año", ln=True)
@@ -206,9 +213,13 @@ def generar_pdf(resumen, df):
     pdf.ln(th)
 
     for row in df.itertuples(index=False):
-        for item in row:
-            pdf.cell(col_width, th, f"{item}", border=1)
-        pdf.ln(th)
+      for item in row:
+          if isinstance(item, float):
+              cell_val = f"{item:,.0f}"   # <-- No decimals, thousands separator
+          else:
+              cell_val = str(item)
+          pdf.cell(col_width, th, cell_val, border=1)
+      pdf.ln(th)
 
     pdf_content = pdf.output(dest="S")
     if isinstance(pdf_content, bytes):  # FPDF2 returns bytes
