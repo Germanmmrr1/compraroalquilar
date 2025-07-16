@@ -806,7 +806,7 @@ elif st.session_state.step == 5:
         if st.button("Enviar email", key="send_email"):
             if email:
                 try:
-                    email_path = os.path.join(os.path.dirname(__file__), "emails.txt")
+                    email_path = "emails.txt"
                     with open(email_path, "a") as f:
                         f.write(email + "\n")
                     st.session_state.email_confirmed = True
