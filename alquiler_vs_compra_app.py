@@ -192,12 +192,6 @@ def generar_pdf(resumen, df):
         "diferencia_patrimonio": "Diferencia patrimonio final",
         "diferencia_costes": "Diferencia costes acumulados",
     }
-    for k, label in etiquetas.items():
-        val = resumen.get(k, "")
-        if isinstance(val, float):
-            val = f"{val:,.0f} €"
-        pdf.cell(0, 8, f"{label}: {val}", ln=True)
-
     pdf.ln(5)
     pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 10, "Resultados por año", ln=True)
