@@ -508,7 +508,7 @@ elif st.session_state.step == 4:
         font-weight: 600;
     }
     .summary-label {
-        color: #222;
+        color: #FFFFFF;
         font-weight: 600;
     }
     .summary-value {
@@ -722,7 +722,7 @@ elif st.session_state.step == 5:
     .res-title {
         font-size: 1.22em; font-weight: 800; margin-bottom: 0.4em; margin-top: -0.1em;
     }
-    .res-label { font-weight: 600; color: #222;}
+    .res-label { font-weight: 600; color: #FFFFFF;}
     .res-value { font-weight: 700; color: #1c6cb8; margin-left: 0.5em;}
     .res-box.green { border: 2px solid #c8ebda; background: #f2fcf7;}
     .res-title.green { color: #13a656;}
