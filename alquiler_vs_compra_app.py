@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import matplotlib.ticker as mticker
+from fpdf import FPDF
+import io
 
 
 
@@ -161,6 +163,60 @@ def calcular_resultados(c, a):
     }
 
     return resumen, df
+
+
+def generar_pdf(resumen, df):
+    """Genera un PDF con el resumen y la tabla de resultados."""
+    pdf = FPDF(orientation="L", unit="mm", format="A4")
+    pdf.add_page()
+
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "Resultados Alquiler vs Compra", ln=True, align="C")
+    pdf.ln(5)
+
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 10, "Resumen", ln=True)
+
+    pdf.set_font("Helvetica", size=11)
+    etiquetas = {
+        "desembolso_inicial_compra": "Desembolso inicial compra",
+        "costes_compra": "Costes acumulados compra",
+        "valor_prop_final": "Valor estimado propiedad",
+        "hipoteca_pendiente": "Hipoteca pendiente",
+        "patrimonio_neto_final": "Patrimonio neto final compra",
+        "inversion_inicial_alq": "Inversión inicial alquiler",
+        "costes_alquiler_total": "Costes alquiler acumulados",
+        "capital_total_invertido": "Capital total invertido",
+        "valor_final_inversion": "Valor final inversión",
+        "patrimonio_neto_final_alq": "Patrimonio neto final alquiler",
+        "diferencia_patrimonio": "Diferencia patrimonio final",
+        "diferencia_costes": "Diferencia costes acumulados",
+    }
+    for k, label in etiquetas.items():
+        val = resumen.get(k, "")
+        if isinstance(val, float):
+            val = f"{val:,.0f} €"
+        pdf.cell(0, 8, f"{label}: {val}", ln=True)
+
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 10, "Resultados por año", ln=True)
+    pdf.set_font("Helvetica", size=7)
+
+    page_width = pdf.w - 2 * pdf.l_margin
+    col_width = page_width / len(df.columns)
+    th = pdf.font_size + 1
+
+    for col in df.columns:
+        pdf.cell(col_width, th, str(col), border=1)
+    pdf.ln(th)
+
+    for row in df.itertuples(index=False):
+        for item in row:
+            pdf.cell(col_width, th, f"{item}", border=1)
+        pdf.ln(th)
+
+    return pdf.output(dest="S").encode("latin-1")
 
 st.markdown("""
     <style>
@@ -758,4 +814,11 @@ elif st.session_state.step == 5:
             df_resultados.to_csv(index=False),
             "alquiler_vs_compra_resultados.csv",
             "text/csv",
+        )
+        pdf_bytes = generar_pdf(resumen, df_resultados)
+        st.download_button(
+            "📄 Descargar reporte en PDF",
+            pdf_bytes,
+            "alquiler_vs_compra_resultados.pdf",
+            "application/pdf",
         )
