@@ -127,19 +127,19 @@ def calcular_resultados(c, a):
 
     df = pd.DataFrame({
         "Año": years,
-        "Precio Vivienda (€)": precio_vivienda_lst,
-        "Gastos iniciales (€)": gastos_iniciales_lst,
-        "Hipoteca amortizada (€)": hipoteca_amortizada_lst,
-        "Deuda Pendiente (€)": deuda_pendiente_lst,
-        "Gastos anuales (€)": gastos_anuales_lst,
-        "Gastos acumulados (€)": gastos_acumulados_lst,
-        "Patrimonio neto compra (€)": patrimonio_neto_lst,
-        "Gasto alquiler anual (€)": gasto_alquiler_anual_lst,
-        "Gasto alquiler acumulado (€)": gasto_alq_acum_lst,
-        "Disponible inversión (€)": disponible_inv_lst,
-        "Total invertido (€)": total_invertido_lst,
-        "Inversión acumulada (€)": inversion_acumulada_lst,
-        "Patrimonio neto alquiler (€)": patrimonio_alq_lst,
+        "Precio Vivienda (EUR)": precio_vivienda_lst,
+        "Gastos iniciales (EUR)": gastos_iniciales_lst,
+        "Hipoteca amortizada (EUR)": hipoteca_amortizada_lst,
+        "Deuda Pendiente (EUR)": deuda_pendiente_lst,
+        "Gastos anuales (EUR)": gastos_anuales_lst,
+        "Gastos acumulados (EUR)": gastos_acumulados_lst,
+        "Patrimonio neto compra (EUR)": patrimonio_neto_lst,
+        "Gasto alquiler anual (EUR)": gasto_alquiler_anual_lst,
+        "Gasto alquiler acumulado (EUR)": gasto_alq_acum_lst,
+        "Disponible inversión (EUR)": disponible_inv_lst,
+        "Total invertido (EUR)": total_invertido_lst,
+        "Inversión acumulada (EUR)": inversion_acumulada_lst,
+        "Patrimonio neto alquiler (EUR)": patrimonio_alq_lst,
     })
 
     resumen = {
