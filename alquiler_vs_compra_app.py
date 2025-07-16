@@ -217,6 +217,8 @@ def generar_pdf(resumen, df):
         pdf.ln(th)
 
     pdf_content = pdf.output(dest="S")
+    if isinstance(pdf_content, bytes):  # FPDF2 returns bytes
+        pdf_content = pdf_content.decode("latin-1", errors="ignore")
     pdf_content = pdf_content.replace("€", "EUR")
     return pdf_content.encode("latin-1")
 
