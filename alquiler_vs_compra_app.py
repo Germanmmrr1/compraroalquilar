@@ -725,6 +725,7 @@ elif st.session_state.step == 5:
     ax2.set_xlabel("Años")
     ax2.set_ylabel("Coste acumulado (€)")
     ax2.legend()
+    ax2.yaxis.set_major_formatter(mticker.StrMethodFormatter('{x:,.0f}'))
     st.pyplot(fig2)
     
 
