@@ -216,7 +216,9 @@ def generar_pdf(resumen, df):
             pdf.cell(col_width, th, f"{item}", border=1)
         pdf.ln(th)
 
-    return pdf.output(dest="S").encode("latin-1")
+    pdf_content = pdf.output(dest="S")
+    pdf_content = pdf_content.replace("€", "EUR")
+    return pdf_content.encode("latin-1")
 
 st.markdown("""
     <style>
