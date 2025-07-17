@@ -458,7 +458,7 @@ elif st.session_state.step == 3:
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Incremento estimado del alquiler cada año, normalmente similar al IPC (Índice de Precios al Consumidor), con valores habituales entre el 2% y el 3%. El aumento se calcula de forma compuesta.")
     rentabilidad_inversion_pct = st.number_input(
     "Rentabilidad inversión anual (%)",
-    0.0, 20.0, 10.0,help="Rentabilidad media anual estimada al invertir el dinero ahorrado en fondos o activos globales.\n"
+    0.0, 20.0, 9.0,help="Rentabilidad media anual estimada al invertir el dinero ahorrado en fondos o activos globales.\n"
          "Ejemplos históricos:\n"
          "• MSCI World: ~8% anual\n"
          "• S&P 500: ~11% anual\n"
