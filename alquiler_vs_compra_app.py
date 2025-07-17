@@ -417,7 +417,7 @@ elif st.session_state.step == 2:
     """,
     unsafe_allow_html=True)
     
-    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 4.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 4% y el 5% anual, pero puede variar según zona y mercado.")
+    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 2.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 2% y el 3% anual, pero puede variar según zona y mercado.")
     gasto_propietario_pct = st.number_input(
     "Gastos propietario anuales (% valor vivienda)",
     0.0, 5.0, 1.5,
