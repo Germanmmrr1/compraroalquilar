@@ -345,12 +345,12 @@ if st.session_state.step == 1:
     st.markdown(
         """
         <div class='big-text'>
-        <b>Compara el coste total de comprar frente a alquilar</b> teniendo en cuenta precio, revalorización, gastos, impuestos y más.
+        <b>Compara comprar para vivir frente a alquilar e invertir</b>. Analiza precio, revalorización, gastos, impuestos y más para tomar la mejor decisión.
         </div>
         <ul style='font-size: 1.3em; line-height: 1.7; margin-top: 20px;'>
-            <li>📊 <b>Simula distintos escenarios</b> y visualiza cuál opción te conviene más.</li>
+            <li>📊 <b>Simula distintos escenarios</b> y visualiza qué opción puede ser más rentable.</li>
             <li>🛠️ <b>Ajusta los valores</b> según tu situación real.</li>
-            <li>💡 <b>Toma la mejor decisión financiera</b> en segundos, gratis.</li>
+            <li>💡 <b>Toma decisiones financieras con datos claros</b> en segundos, gratis.</li>
         </ul>
         """, unsafe_allow_html=True
     )
