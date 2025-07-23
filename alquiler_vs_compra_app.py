@@ -401,8 +401,8 @@ elif st.session_state.step == 2:
     </div>
     """,
     unsafe_allow_html=True)
-    tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.5, 
-                                            help="Tipo de interés anual de la hipoteca. En 2025 está alrededor del 2.5%, puede variar según perfil y banco.")
+    tipo_interes_hipoteca = st.number_input("Interés hipoteca (%)", 0.1, 10.0, 2.8, 
+                                            help="Tipo de interés anual de la hipoteca. Según el BDE, en 2025 está alrededor del 2.8% puede variar según perfil y banco.")
     plazo_hipoteca = st.slider("Plazo hipoteca (años)", 5, 40, 25, help="Duración de la hipoteca en años, normalmente entre 20 y 30 años.")
     capital_financiado = precio_vivienda - entrada_eur
     tipo_interes_mensual = tipo_interes_hipoteca / 100 / 12
@@ -419,7 +419,7 @@ elif st.session_state.step == 2:
     """,
     unsafe_allow_html=True)
     
-    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 2.5, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 2% y el 3% anual, pero puede variar según zona y mercado.")
+    revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 2.0, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 1.5% y el 2.5% anual, pero puede variar según zona y mercado.")
     gasto_propietario_pct = st.number_input(
     "Gastos propietario anuales (% valor vivienda)",
     0.0, 5.0, 1.5,
@@ -457,7 +457,7 @@ elif st.session_state.step == 2:
 elif st.session_state.step == 3:
     st.markdown("<div class='step-header'>🏡 Paso 2 de 3: Datos de Alquiler</div>", unsafe_allow_html=True)
     alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Precio de alquiler de propiedades parecidas en la zona.")
-    subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Incremento estimado del alquiler cada año, normalmente similar al IPC (Índice de Precios al Consumidor), con valores habituales entre el 2% y el 3%. El aumento se calcula de forma compuesta.")
+    subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Incremento estimado del alquiler cada año, normalmente similar al IPC (Índice de Precios al Consumidor), con valores habituales entre el 1.5% y el 2.5%. El aumento se calcula de forma compuesta.")
     rentabilidad_inversion_pct = st.number_input(
     "Rentabilidad inversión anual (%)",
     0.0, 20.0, 9.0,help="Rentabilidad media anual estimada al invertir el dinero ahorrado en fondos o activos globales.\n"
