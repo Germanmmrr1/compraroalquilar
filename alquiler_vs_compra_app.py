@@ -345,13 +345,15 @@ if st.session_state.step == 1:
     st.markdown(
         """
         <div class='big-text'>
-        <b>Compara comprar para vivir frente a alquilar e invertir</b>. Analiza precio, revalorización, gastos, impuestos y más para tomar la mejor decisión.
+        <b>¿Comprar para vivir o alquilar e invertir?</b> Descubre cuál opción puede ser mejor para tu bolsillo a largo plazo.
         </div>
         <ul style='font-size: 1.3em; line-height: 1.7; margin-top: 20px;'>
-            <li>📊 <b>Simula distintos escenarios</b> y visualiza qué opción puede ser más rentable.</li>
-            <li>🛠️ <b>Ajusta los valores</b> según tu situación real.</li>
-            <li>💡 <b>Toma decisiones financieras con datos claros</b> en segundos, gratis.</li>
+            <li>🏠 <b>Opción 1:</b> Comprar un piso para vivir.</li>
+            <li>📈 <b>Opción 2:</b> Vivir de alquiler e invertir el dinero que ahorras en otros activos.</li>
         </ul>
+        <p style='font-size: 1.3em; line-height: 1.7; margin-top: 15px;'>
+            Compara precio, revalorización, gastos, impuestos y descubre qué alternativa puede hacer crecer más tu patrimonio.
+        </p>
         """, unsafe_allow_html=True
     )
     col1, col2, col3 = st.columns([2, 1, 2])
