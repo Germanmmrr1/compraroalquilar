@@ -422,7 +422,7 @@ elif st.session_state.step == 2:
     revalorizacion_vivienda_pct = st.number_input("Revalorización vivienda anual (%)", -5.0, 15.0, 2.0, help="Aumento esperado en el valor de la vivienda por año. Históricamente ha subido entre el 1.5% y el 2.5% anual, pero puede variar según zona y mercado.")
     gasto_propietario_pct = st.number_input(
     "Gastos propietario anuales (% valor vivienda)",
-    0.0, 5.0, 1.5,
+    0.0, 5.0, 1.0,
     help="Incluye la suma estimada de:\n"
          "• IBI anual (700 € aprox., suele oscilar entre 0,4% y 1,1% del valor catastral según municipio)\n"
          "• Comunidad (80 €/mes aprox., varía según servicios y tipo de edificio)\n"
@@ -456,7 +456,7 @@ elif st.session_state.step == 2:
 # Paso 3: Variables de Alquiler
 elif st.session_state.step == 3:
     st.markdown("<div class='step-header'>🏡 Paso 2 de 3: Datos de Alquiler</div>", unsafe_allow_html=True)
-    alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 800, step=50, help="Precio de alquiler de propiedades parecidas en la zona.")
+    alquiler_inicial = st.number_input("💸 Alquiler mensual actual (€)", 300, 5000, 1000, step=50, help="Precio de alquiler de propiedades parecidas en la zona.")
     subida_alquiler_anual_pct = st.number_input("Subida anual alquiler (%)", 0.0, 10.0, 2.0, help="Incremento estimado del alquiler cada año, normalmente similar al IPC (Índice de Precios al Consumidor), con valores habituales entre el 1.5% y el 2.5%. El aumento se calcula de forma compuesta.")
     rentabilidad_inversion_pct = st.number_input(
     "Rentabilidad inversión anual (%)",
@@ -624,7 +624,7 @@ elif st.session_state.step == 5:
             "Gastos propietario anuales (% valor vivienda)",
             0.0,
             5.0,
-            c.get('gasto_propietario_pct', 1.5),
+            c.get('gasto_propietario_pct', 1.0),
             key="res_gasto_propietario_pct",
         )
         c['seguro_hogar_eur'] = st.number_input(
@@ -657,7 +657,7 @@ elif st.session_state.step == 5:
             "💸 Alquiler mensual actual (€)",
             300,
             5000,
-            a.get('alquiler_inicial', 800),
+            a.get('alquiler_inicial', 1000),
             step=50,
             key="res_alquiler_inicial",
         )
