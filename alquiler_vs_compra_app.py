@@ -165,6 +165,100 @@ def calcular_resultados(c, a):
     return resumen, df
 
 
+def calcular_compra_para_alquilar(c, r):
+    """Calcula los resultados de comprar una vivienda para alquilarla."""
+    precio_vivienda = c['precio_vivienda']
+    entrada_pct = c['entrada_pct']
+    gastos_compra_pct = c['gastos_compra_pct']
+    tipo_interes_hipoteca = c['tipo_interes_hipoteca']
+    plazo_hipoteca = c['plazo_hipoteca']
+
+    horizonte_anios = r.get('horizonte_anios', plazo_hipoteca)
+    alquiler_mensual = r.get('alquiler_mensual', 1000.0)
+    subida_alquiler_pct = r.get('subida_alquiler_anual_pct', 0.0)
+    meses_vacios = r.get('meses_vacios', 0)
+    gastos_anuales = r.get('gastos_anuales', 0.0)
+    irpf_pct = r.get('irpf_pct', 0.0)
+    valor_construccion_pct = r.get('valor_construccion_pct', 70.0)
+    reduccion_habitual = r.get('reduccion_habitual', True)
+    revalorizacion_pct = r.get('revalorizacion_pct', 0.0)
+
+    entrada = precio_vivienda * entrada_pct / 100
+    gastos_compra = precio_vivienda * gastos_compra_pct / 100
+    capital_financiado = precio_vivienda - entrada
+
+    tasa_mensual = tipo_interes_hipoteca / 100 / 12
+    meses_totales = plazo_hipoteca * 12
+    cuota_mensual = npf.pmt(tasa_mensual, meses_totales, -capital_financiado)
+    cuota_anual = cuota_mensual * 12
+
+    amort_acum, deuda_anual = amortizacion_hipoteca(
+        capital_financiado, tasa_mensual, meses_totales, horizonte_anios
+    )
+
+    valor_construccion = precio_vivienda * valor_construccion_pct / 100
+    amortizacion_anual = valor_construccion * 0.03
+
+    years = []
+    ingresos_list = []
+    gastos_list = []
+    hipoteca_list = []
+    impuesto_list = []
+    beneficio_neto_list = []
+    patrimonio_neto_list = []
+
+    beneficio_acum = 0.0
+
+    for year in range(1, horizonte_anios + 1):
+        ingresos = (
+            alquiler_mensual
+            * (1 + subida_alquiler_pct / 100) ** (year - 1)
+            * (12 - meses_vacios)
+        )
+        cuota_ano = cuota_anual if year <= plazo_hipoteca else 0.0
+        beneficio_pre = ingresos - gastos_anuales - cuota_ano
+
+        base = ingresos - gastos_anuales - cuota_ano - amortizacion_anual
+        if base > 0 and reduccion_habitual:
+            base *= 0.4
+        impuesto = base * irpf_pct / 100 if base > 0 else 0.0
+
+        beneficio_neto = ingresos - gastos_anuales - cuota_ano - impuesto
+        beneficio_acum += beneficio_neto
+
+        valor_actual = precio_vivienda * (1 + revalorizacion_pct / 100) ** year
+        patrimonio_actual = valor_actual - deuda_anual[year]
+
+        years.append(year)
+        ingresos_list.append(ingresos)
+        gastos_list.append(gastos_anuales + cuota_ano)
+        hipoteca_list.append(deuda_anual[year])
+        impuesto_list.append(impuesto)
+        beneficio_neto_list.append(beneficio_neto)
+        patrimonio_neto_list.append(patrimonio_actual)
+
+    df = pd.DataFrame({
+        "Año": years,
+        "Ingresos alquiler (EUR)": ingresos_list,
+        "Gastos + Hipoteca (EUR)": gastos_list,
+        "Impuestos (EUR)": impuesto_list,
+        "Beneficio neto (EUR)": beneficio_neto_list,
+        "Patrimonio neto (EUR)": patrimonio_neto_list,
+    })
+
+    valor_final = precio_vivienda * (1 + revalorizacion_pct / 100) ** horizonte_anios
+    resumen = {
+        "inversion_inicial_alq_compra": entrada + gastos_compra,
+        "beneficio_total": beneficio_acum,
+        "rentabilidad_neta_pct": beneficio_acum / (entrada + gastos_compra) * 100,
+        "valor_prop_final_inv": valor_final,
+        "hipoteca_pendiente_inv": deuda_anual[horizonte_anios],
+        "patrimonio_neto_final_inv": valor_final - deuda_anual[horizonte_anios],
+    }
+
+    return resumen, df
+
+
 def generar_pdf(resumen, df):
     """Genera un PDF con el resumen y la tabla de resultados."""
     pdf = FPDF(orientation="L", unit="mm", format="A4")
@@ -436,7 +530,7 @@ elif st.session_state.step == 2:
     else:
         seguro_vida_eur = 0.0
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     if col1.button("⬅️ Volver", key="compra_back"):
         cambiar_paso(1)
     if col2.button("Siguiente ➡️", key="compra_next"):
@@ -683,11 +777,92 @@ elif st.session_state.step == 5:
             key="res_horizonte_anios",
         )
 
+    with st.expander("🔧 Editar compra para alquilar"):
+        r = st.session_state.get('compra_renta', {
+            'alquiler_mensual': 1000.0,
+            'subida_alquiler_anual_pct': 0.0,
+            'gastos_anuales': 0.0,
+            'meses_vacios': 1,
+            'irpf_pct': 24.0,
+            'valor_construccion_pct': 70.0,
+            'reduccion_habitual': True,
+            'revalorizacion_pct': c.get('revalorizacion_vivienda_pct', 0.0),
+            'horizonte_anios': a.get('horizonte_anios', c.get('plazo_hipoteca', 25))
+        })
+        r['alquiler_mensual'] = st.number_input(
+            "Alquiler mensual que cobras (€)",
+            300.0,
+            5000.0,
+            r.get('alquiler_mensual', 1000.0),
+            step=50.0,
+            key="res_rent_alq_mensual",
+        )
+        r['subida_alquiler_anual_pct'] = st.number_input(
+            "Subida anual del alquiler (%)",
+            0.0,
+            10.0,
+            r.get('subida_alquiler_anual_pct', 0.0),
+            key="res_rent_subida_pct",
+        )
+        r['gastos_anuales'] = st.number_input(
+            "Gastos anuales de la propiedad (€)",
+            0.0,
+            20000.0,
+            float(r.get('gastos_anuales', 0.0)),
+            step=100.0,
+            key="res_rent_gastos_anuales",
+        )
+        r['meses_vacios'] = st.number_input(
+            "Meses vacíos al año",
+            0,
+            12,
+            int(r.get('meses_vacios', 1)),
+            step=1,
+            key="res_rent_meses_vacios",
+        )
+        r['irpf_pct'] = st.number_input(
+            "Tipo marginal IRPF (%)",
+            0.0,
+            50.0,
+            float(r.get('irpf_pct', 24.0)),
+            step=1.0,
+            key="res_rent_irpf",
+        )
+        r['valor_construccion_pct'] = st.number_input(
+            "% valor construcción sobre precio",
+            0.0,
+            100.0,
+            float(r.get('valor_construccion_pct', 70.0)),
+            step=1.0,
+            key="res_rent_valor_const",
+        )
+        r['reduccion_habitual'] = st.checkbox(
+            "Aplicar reducción 60% vivienda habitual del inquilino",
+            value=r.get('reduccion_habitual', True),
+            key="res_rent_reduccion",
+        )
+        r['revalorizacion_pct'] = st.number_input(
+            "Revalorización anual del inmueble (%)",
+            -5.0,
+            15.0,
+            float(r.get('revalorizacion_pct', c.get('revalorizacion_vivienda_pct', 0.0))),
+            key="res_rent_revalorizacion",
+        )
+        r['horizonte_anios'] = st.slider(
+            "Horizonte de análisis (años)",
+            1,
+            40,
+            int(r.get('horizonte_anios', a.get('horizonte_anios', c.get('plazo_hipoteca', 25)))),
+            key="res_rent_horizonte",
+        )
+
     # Guardar cambios
     st.session_state.compra = c
     st.session_state.alquiler = a
+    st.session_state.compra_renta = r
 
     resumen, df_resultados = calcular_resultados(c, a)
+    resumen_renta, df_renta = calcular_compra_para_alquilar(c, r)
 
     horizonte_anios = len(resumen["anios"])
 
@@ -708,6 +883,14 @@ elif st.session_state.step == 5:
     inversion_alquiler = resumen["inversion_alquiler"]
     coste_compra_acumulado = resumen["coste_compra_acumulado"]
     coste_alquiler_acumulado = resumen["coste_alquiler_acumulado"]
+
+    inv_inicial_renta = resumen_renta["inversion_inicial_alq_compra"]
+    beneficio_total_renta = resumen_renta["beneficio_total"]
+    rentabilidad_renta = resumen_renta["rentabilidad_neta_pct"]
+    valor_final_renta = resumen_renta["valor_prop_final_inv"]
+    hipoteca_pendiente_renta = resumen_renta["hipoteca_pendiente_inv"]
+    patrimonio_neto_final_renta = resumen_renta["patrimonio_neto_final_inv"]
+    patrimonio_renta = df_renta["Patrimonio neto (EUR)"].tolist()
 
     # --- Visualización tipo "caja resumen" ---
     st.markdown("""
@@ -761,6 +944,18 @@ elif st.session_state.step == 5:
         st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value green'>{patrimonio_neto_final_alq:,.0f} €</span></div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    with col3:
+        st.markdown("<div class='res-box'>", unsafe_allow_html=True)
+        st.markdown("<div class='res-title'><span style='color:#1c6cb8;'>🏘️ Comprar para alquilar</span></div>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Inversión inicial:</span><span class='res-value'>{inv_inicial_renta:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Beneficio neto total:</span><span class='res-value'>{beneficio_total_renta:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Rentabilidad neta:</span><span class='res-value'>{rentabilidad_renta:,.1f}%</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Valor estimado propiedad:</span><span class='res-value'>{valor_final_renta:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Hipoteca pendiente:</span><span class='res-value red'>{hipoteca_pendiente_renta:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown("<div class='line'></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value'>{patrimonio_neto_final_renta:,.0f} €</span></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
     # Comparativa global de resultados
     ventaja = "Alquiler + Inversión" if diferencia_patrimonio > 0 else "Compra"
     st.markdown(
@@ -779,6 +974,7 @@ elif st.session_state.step == 5:
     fig, ax = plt.subplots()
     ax.plot(anios, patrimonio_compra, label="Compra")
     ax.plot(anios, inversion_alquiler, label="Alquilar e invertir")
+    ax.plot(range(1, len(patrimonio_renta) + 1), patrimonio_renta, label="Comprar para alquilar")
     ax.set_xlabel("Años")
     ax.set_ylabel("Patrimonio (€)")
     ax.legend()
