@@ -851,7 +851,7 @@ elif st.session_state.step == 5:
     
     st.markdown(f"<h2 style='text-align:center; margin-bottom: 0.7em;'>Resultados Estimados a <span style='color:#1c6cb8;'>{horizonte_anios} años</span></h2>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         st.markdown("<div class='res-box'>", unsafe_allow_html=True)
