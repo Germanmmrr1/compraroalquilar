@@ -11,8 +11,7 @@ import io
 
 def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
                           horizonte: int):
-    """Devuelve la amortización y la deuda pendiente por año considerando
-    capital e intereses."""
+    """Devuelve la amortización, la deuda pendiente y los intereses por año."""
 
     cuota = npf.pmt(tasa_mensual, meses, -capital)
 
@@ -22,6 +21,8 @@ def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
 
     amort_anual = [0.0]
     deuda_anual = [deuda_total]
+    interes_anual = [0.0]
+    interes_acum = 0.0
 
     for mes in range(1, min(meses, horizonte * 12) + 1):
         interes = saldo_capital * tasa_mensual
@@ -29,15 +30,19 @@ def amortizacion_hipoteca(capital: float, tasa_mensual: float, meses: int,
         saldo_capital -= principal
         pagos_realizados += cuota
         deuda_total -= cuota
+        interes_acum += interes
         if mes % 12 == 0:
             amort_anual.append(pagos_realizados)
             deuda_anual.append(max(deuda_total, 0.0))
+            interes_anual.append(interes_acum)
+            interes_acum = 0.0
 
     while len(amort_anual) < horizonte + 1:
         amort_anual.append(pagos_realizados)
         deuda_anual.append(max(deuda_total, 0.0))
+        interes_anual.append(interes_acum)
 
-    return amort_anual, deuda_anual
+    return amort_anual, deuda_anual, interes_anual
 
 
 def calcular_resultados(c, a):
@@ -66,7 +71,7 @@ def calcular_resultados(c, a):
     cuota_mensual = npf.pmt(tasa_mensual, meses_totales, -capital_financiado)
     cuota_anual = cuota_mensual * 12
 
-    amort_acum, deuda_anual = amortizacion_hipoteca(
+    amort_acum, deuda_anual, interes_anual = amortizacion_hipoteca(
         capital_financiado, tasa_mensual, meses_totales, horizonte_anios
     )
 
@@ -85,6 +90,20 @@ def calcular_resultados(c, a):
     total_invertido_lst = [entrada + gastos_compra]
     inversion_acumulada_lst = [entrada + gastos_compra]
     patrimonio_alq_lst = [entrada + gastos_compra]
+
+    # Datos para la opción Comprar para alquilar
+    alquiler_inversion_mensual = a.get('alquiler_inversion_mensual', alquiler_inicial)
+    gastos_anuales_inversion = a.get('gastos_anuales_inversion', 0.0)
+    tasa_irpf = a.get('tasa_irpf', 0.0)
+    habitual_inquilino = a.get('habitual_inquilino', True)
+    amort_deduccion = precio_vivienda * 0.3 * 0.03
+
+    ingreso_renta_lst = [0.0]
+    gasto_renta_lst = [0.0]
+    beneficio_pre_lst = [0.0]
+    beneficio_post_lst = [0.0]
+    patrimonio_renta_lst = [-(entrada + gastos_compra)]
+    beneficio_acum_post = 0.0
 
     inversion_inquilino = entrada + gastos_compra
     capital_invertido = entrada + gastos_compra
@@ -109,6 +128,24 @@ def calcular_resultados(c, a):
         inversion_inquilino *= (1 + rentabilidad_inversion_pct / 100)
         inversion_inquilino += aportacion
         capital_invertido += aportacion
+
+        # -- Calculos para la opcion comprar para alquilar --
+        ingreso_renta = alquiler_inversion_mensual * (1 + subida_alquiler_anual_pct / 100) ** (year - 1) * 12
+        gasto_renta = gastos_propietario + gastos_anuales_inversion + cuota_ano
+        beneficio_pre = ingreso_renta - gasto_renta
+        base_imponible = ingreso_renta - gastos_anuales_inversion - gastos_propietario - interes_anual[year] - amort_deduccion
+        if habitual_inquilino:
+            base_imponible *= 0.4
+        impuesto = max(base_imponible * tasa_irpf / 100, 0.0)
+        beneficio_post = beneficio_pre - impuesto
+        beneficio_acum_post += beneficio_post
+        patrimonio_renta = valor_actual_vivienda - deuda_actual + beneficio_acum_post
+
+        ingreso_renta_lst.append(ingreso_renta)
+        gasto_renta_lst.append(gasto_renta)
+        beneficio_pre_lst.append(beneficio_pre)
+        beneficio_post_lst.append(beneficio_post)
+        patrimonio_renta_lst.append(patrimonio_renta)
 
         years.append(year)
         precio_vivienda_lst.append(valor_actual_vivienda)
@@ -140,6 +177,11 @@ def calcular_resultados(c, a):
         "Total invertido (EUR)": total_invertido_lst,
         "Inversión acumulada (EUR)": inversion_acumulada_lst,
         "Patrimonio neto alquiler (EUR)": patrimonio_alq_lst,
+        "Ingreso alquiler inversion (EUR)": ingreso_renta_lst,
+        "Gasto alquiler inversion (EUR)": gasto_renta_lst,
+        "Beneficio bruto inversion (EUR)": beneficio_pre_lst,
+        "Beneficio neto inversion (EUR)": beneficio_post_lst,
+        "Patrimonio neto compra para alquilar (EUR)": patrimonio_renta_lst,
     })
 
     resumen = {
@@ -160,6 +202,11 @@ def calcular_resultados(c, a):
         "inversion_alquiler": inversion_acumulada_lst[1:],
         "coste_compra_acumulado": gastos_acumulados_lst[1:],
         "coste_alquiler_acumulado": gasto_alq_acum_lst[1:],
+        "beneficio_total_bruto_rent": sum(beneficio_pre_lst[1:]),
+        "beneficio_total_neto_rent": beneficio_acum_post,
+        "patrimonio_neto_final_rent": patrimonio_renta_lst[-1],
+        "rentabilidad_neta_pct_rent": (beneficio_acum_post / (entrada + gastos_compra) * 100) if (entrada + gastos_compra) else 0.0,
+        "patrimonio_rent": patrimonio_renta_lst[1:],
     }
 
     return resumen, df
@@ -191,6 +238,9 @@ def generar_pdf(resumen, df):
         "patrimonio_neto_final_alq": "Patrimonio neto final alquiler",
         "diferencia_patrimonio": "Diferencia patrimonio final",
         "diferencia_costes": "Diferencia costes acumulados",
+        "beneficio_total_neto_rent": "Beneficio neto total alquiler",
+        "patrimonio_neto_final_rent": "Patrimonio neto final compra para alquilar",
+        "rentabilidad_neta_pct_rent": "Rentabilidad neta % compra para alquilar",
     }
     pdf.set_font("Helvetica", size=11)
     for k, label in etiquetas.items():
@@ -350,6 +400,7 @@ if st.session_state.step == 1:
         <ul style='font-size: 1.3em; line-height: 1.7; margin-top: 20px;'>
             <li>🏠 <b>Opción 1:</b> Comprar un piso para vivir.</li>
             <li>📈 <b>Opción 2:</b> Vivir de alquiler e invertir el dinero que ahorras en otros activos.</li>
+            <li>🏘️ <b>Opción 3:</b> Comprar un piso para alquilarlo y obtener rentas.</li>
         </ul>
         <p style='font-size: 1.3em; line-height: 1.7; margin-top: 15px;'>
             Compara precio, revalorización, gastos, impuestos y descubre qué alternativa puede hacer crecer más tu patrimonio.
@@ -436,7 +487,7 @@ elif st.session_state.step == 2:
     else:
         seguro_vida_eur = 0.0
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     if col1.button("⬅️ Volver", key="compra_back"):
         cambiar_paso(1)
     if col2.button("Siguiente ➡️", key="compra_next"):
@@ -469,6 +520,27 @@ elif st.session_state.step == 3:
     horizonte_anios = st.slider(
         "Horizonte de análisis (años)", 1, 40, 25, help="Número de años para comparar compra y alquiler.",)
 
+    st.markdown("### Datos para comprar y alquilar")
+    alquiler_inversion_mensual = st.number_input(
+        "Alquiler mensual esperado si compras para alquilar (€)",
+        300,
+        5000,
+        900,
+        step=50,
+    )
+    gastos_anuales_inversion = st.number_input(
+        "Gastos anuales vivienda alquilada (€)",
+        0,
+        20000,
+        1000,
+        step=100,
+    )
+    tasa_irpf = st.number_input("Tipo marginal IRPF (%)", 0.0, 50.0, 25.0)
+    habitual_inquilino = st.checkbox(
+        "Inquilino con vivienda habitual (reducción 60%)",
+        value=True,
+    )
+
     col1, col2 = st.columns(2)
     if col1.button("⬅️ Volver", key="alquiler_back"):
         cambiar_paso(2)
@@ -478,6 +550,10 @@ elif st.session_state.step == 3:
             "subida_alquiler_anual_pct": subida_alquiler_anual_pct,
             "rentabilidad_inversion_pct": rentabilidad_inversion_pct,
             "horizonte_anios": horizonte_anios,
+            "alquiler_inversion_mensual": alquiler_inversion_mensual,
+            "gastos_anuales_inversion": gastos_anuales_inversion,
+            "tasa_irpf": tasa_irpf,
+            "habitual_inquilino": habitual_inquilino,
         }
         cambiar_paso(4)
 
@@ -554,6 +630,10 @@ elif st.session_state.step == 4:
             "subida_alquiler_anual_pct": "Subida anual alquiler (%)",
             "rentabilidad_inversion_pct": "Rentabilidad inversión anual (%)",
             "horizonte_anios": "Horizonte (años)",
+            "alquiler_inversion_mensual": "Alq. mensual si alquilas (€)",
+            "gastos_anuales_inversion": "Gastos anuales alquiler (€)",
+            "tasa_irpf": "IRPF (%)",
+            "habitual_inquilino": "Reducción 60%",
         }
         for key, label in alquiler_labels.items():
             value = st.session_state.alquiler.get(key, "-")
@@ -682,6 +762,34 @@ elif st.session_state.step == 5:
             a.get('horizonte_anios', c.get('plazo_hipoteca', 25)),
             key="res_horizonte_anios",
         )
+        a['alquiler_inversion_mensual'] = st.number_input(
+            "Alquiler mensual si compras para alquilar (€)",
+            300,
+            5000,
+            a.get('alquiler_inversion_mensual', 900),
+            step=50,
+            key="res_alq_inv_mensual",
+        )
+        a['gastos_anuales_inversion'] = st.number_input(
+            "Gastos anuales vivienda alquilada (€)",
+            0,
+            20000,
+            a.get('gastos_anuales_inversion', 1000),
+            step=100,
+            key="res_gastos_inv",
+        )
+        a['tasa_irpf'] = st.number_input(
+            "Tipo marginal IRPF (%)",
+            0.0,
+            50.0,
+            a.get('tasa_irpf', 25.0),
+            key="res_irpf",
+        )
+        a['habitual_inquilino'] = st.checkbox(
+            "Inquilino vivienda habitual (reducción 60%)",
+            value=a.get('habitual_inquilino', True),
+            key="res_habitual",
+        )
 
     # Guardar cambios
     st.session_state.compra = c
@@ -701,6 +809,9 @@ elif st.session_state.step == 5:
     capital_total_invertido = resumen["capital_total_invertido"]
     valor_final_inversion = resumen["valor_final_inversion"]
     patrimonio_neto_final_alq = resumen["patrimonio_neto_final_alq"]
+    beneficio_total_neto_rent = resumen["beneficio_total_neto_rent"]
+    patrimonio_neto_final_rent = resumen["patrimonio_neto_final_rent"]
+    rentabilidad_neta_pct_rent = resumen["rentabilidad_neta_pct_rent"]
     diferencia_patrimonio = resumen["diferencia_patrimonio"]
     diferencia_costes = resumen["diferencia_costes"]
     anios = resumen["anios"]
@@ -729,6 +840,9 @@ elif st.session_state.step == 5:
     .res-title.green { color: #13a656;}
     .res-title.black { color: #222;}
     .res-value.green { color: #13a656;}
+    .res-box.orange { border: 2px solid #ffd3b6; background: #fff5eb;}
+    .res-title.orange { color: #e67e22;}
+    .res-value.orange { color: #e67e22;}
     .red { color: #e03a3a; font-weight: bold;}
     .line { border-bottom: 1.1px solid #b0b8c2; margin: 0.6em 0;}
     .final-row {font-size:1.13em; font-weight:900; margin-top:0.7em;}
@@ -759,6 +873,15 @@ elif st.session_state.step == 5:
         st.markdown(f"<span class='res-label'>Valor final inversión:</span><span class='res-value green'>{valor_final_inversion:,.0f} €</span>", unsafe_allow_html=True)
         st.markdown("<div class='line'></div>", unsafe_allow_html=True)
         st.markdown(f"<div class='final-row'>Patrimonio Neto Final: <span class='res-value green'>{patrimonio_neto_final_alq:,.0f} €</span></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("<div class='res-box orange'>", unsafe_allow_html=True)
+        st.markdown("<div class='res-title orange'>🏘️ Comprar para Alquilar</div>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Beneficio neto total:</span><span class='res-value orange'>{beneficio_total_neto_rent:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown(f"<span class='res-label'>Patrimonio neto final:</span><span class='res-value orange'>{patrimonio_neto_final_rent:,.0f} €</span>", unsafe_allow_html=True)
+        st.markdown("<div class='line'></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='final-row'>Rentabilidad neta: <span class='res-value orange'>{rentabilidad_neta_pct_rent:,.1f}%</span></div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Comparativa global de resultados
